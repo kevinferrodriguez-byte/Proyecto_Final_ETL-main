@@ -216,9 +216,8 @@ Detalle y tratamiento en [docs/12_limitaciones_y_proximos_pasos.md](docs/12_limi
 | [06 · Diccionario de datos](docs/06_diccionario_datos.md) *(generado)* | Todas las tablas y columnas |
 | [07 · Modelo de datos](docs/07_modelo_datos.md) | Diagrama ER, grano, claves y decisiones |
 | [08 · Linaje](docs/08_linaje_datos.md) | Linaje por conjunto, por KPI y ejemplo inverso |
-| [09 · Catálogo de reglas de calidad](docs/09_catalogo_reglas_calidad.md) *(generado)* | Las 111 reglas por capa |
+| [09 · Catálogo de reglas de calidad](docs/09_catalogo_reglas_calidad.md) | Las 111 reglas por capa |
 | [10 · Calidad y validación](docs/10_calidad_y_validacion.md) | Estrategia y resultados de la ejecución real |
 | [11 · Guía de Power BI](docs/11_guia_power_bi.md) | Conexión, relaciones, DAX y pestañas |
 | [12 · Limitaciones y próximos pasos](docs/12_limitaciones_y_proximos_pasos.md) | |
-| [13 · Rediseño del tablero de Power BI](docs/13_rediseno_tablero_power_bi.md) | Diagnóstico UX, *storytelling*, wireframes, sistema visual y plan de implementación |
 | [Anexos](docs/anexos/) | Decisiones detalladas de Plata INE y Seguridad Social
