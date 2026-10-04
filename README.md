@@ -210,8 +210,8 @@ Detalle y tratamiento en [docs/12_limitaciones_y_proximos_pasos.md](docs/12_limi
 | [02 · Arquitectura](docs/02_arquitectura.md) | Medallion, flujo ETL, estructura y decisiones |
 | [03 · Fuentes de datos](docs/03_fuentes_datos.md) | Análisis por fuente, relaciones, Banco de España, fuentes periodísticas |
 | [04 · OKR, KPI y trazabilidad](docs/04_okr_kpi_trazabilidad.md) | Ficha de cada KPI, matriz de trazabilidad, preguntas reformuladas |
-| [05 · Diccionario de métricas](docs/05_diccionario_metricas.md) *(generado)* | Fórmula, frecuencia, unidad, fuente y agregación |
-| [06 · Diccionario de datos](docs/06_diccionario_datos.md) *(generado)* | Todas las tablas y columnas |
+| [05 · Diccionario de métricas](docs/05_diccionario_metricas.md) | Fórmula, frecuencia, unidad, fuente y agregación |
+| [06 · Diccionario de datos](docs/06_diccionario_datos.md) | Todas las tablas y columnas |
 | [07 · Modelo de datos](docs/07_modelo_datos.md) | Diagrama ER, grano, claves y decisiones |
 | [08 · Linaje](docs/08_linaje_datos.md) | Linaje por conjunto, por KPI y ejemplo inverso |
 | [09 · Catálogo de reglas de calidad](docs/09_catalogo_reglas_calidad.md) | Las 111 reglas por capa |
