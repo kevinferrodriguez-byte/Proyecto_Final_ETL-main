@@ -1,0 +1,179 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "14e474038f3f59659850",
+  "position": {
+    "x": 8,
+    "y": 8,
+    "z": 0,
+    "width": 304,
+    "height": 224,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "multiRowCard",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · indicador"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · indicador",
+              "nativeQueryRef": "Def · indicador",
+              "displayName": "Indicador"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · fórmula"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · fórmula",
+              "nativeQueryRef": "Def · fórmula",
+              "displayName": "Fórmula"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · unidad"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · unidad",
+              "nativeQueryRef": "Def · unidad",
+              "displayName": "Unidad"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · fuente"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · fuente",
+              "nativeQueryRef": "Def · fuente",
+              "displayName": "Fuente"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · cobertura"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · cobertura",
+              "nativeQueryRef": "Def · cobertura",
+              "displayName": "Cobertura observada"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_indicadores_anual"
+                    }
+                  },
+                  "Property": "Def · descripción"
+                }
+              },
+              "queryRef": "fact_indicadores_anual.Def · descripción",
+              "nativeQueryRef": "Def · descripción",
+              "displayName": "Definición"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1F2328'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#57606A'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

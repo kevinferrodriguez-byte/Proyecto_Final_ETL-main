@@ -1,0 +1,87 @@
+table aux_calidad_reglas
+	lineageTag: 7c97c62e-1d50-52fe-87c0-30b262ddac31
+
+	measure 'Reglas evaluadas' = COUNTROWS(aux_calidad_reglas)
+		formatString: #,0
+		lineageTag: 33823af3-318e-5b5e-b1d9-3a0cd381d7a8
+
+	measure 'Reglas superadas' = CALCULATE(COUNTROWS(aux_calidad_reglas), aux_calidad_reglas[resultado] = "cumple") + 0
+		formatString: #,0
+		lineageTag: 9147c374-d11a-57fe-b988-5543c6d8e834
+
+	measure 'Reglas con falla' = CALCULATE(COUNTROWS(aux_calidad_reglas), aux_calidad_reglas[resultado] = "falla") + 0
+		formatString: #,0
+		lineageTag: b97e4223-3e7f-54e8-8764-aa8f39685da8
+
+	measure 'Reglas con advertencia' = CALCULATE(COUNTROWS(aux_calidad_reglas), aux_calidad_reglas[resultado] = "advertencia") + 0
+		formatString: #,0
+		lineageTag: abe4f0aa-5d53-5e25-a189-0ec2d1ca615f
+
+	column capa
+		dataType: string
+		lineageTag: 63980962-6a4d-5c11-b62a-dbb11293e250
+		summarizeBy: none
+		sourceColumn: capa
+
+		annotation SummarizationSetBy = Automatic
+
+	column run_id
+		dataType: string
+		lineageTag: a52955da-17b9-5927-b0c8-23ce81fb0dfd
+		summarizeBy: none
+		sourceColumn: run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column regla
+		dataType: string
+		lineageTag: 7a72623d-4c0b-57d1-850f-4e86633adff6
+		summarizeBy: none
+		sourceColumn: regla
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: a272ec4c-5734-5ab4-a7ae-67e8e3db84a2
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	column resultado
+		dataType: string
+		lineageTag: 5e1a2bd7-1431-5e68-bca9-a029e69e7348
+		summarizeBy: none
+		sourceColumn: resultado
+
+		annotation SummarizationSetBy = Automatic
+
+	column n_detalles
+		dataType: int64
+		lineageTag: 089dfd7e-66f4-53d8-a017-37619dbc9dce
+		summarizeBy: none
+		sourceColumn: n_detalles
+
+		annotation SummarizationSetBy = Automatic
+
+	column detalle
+		dataType: string
+		lineageTag: 5f16b7aa-adf1-57a5-9d92-f92051aabba7
+		summarizeBy: none
+		sourceColumn: detalle
+
+		annotation SummarizationSetBy = Automatic
+
+	partition aux_calidad_reglas = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "aux_calidad_reglas.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"capa", type text}, {"run_id", type text}, {"regla", type text}, {"descripcion", type text}, {"resultado", type text}, {"n_detalles", Int64.Type}, {"detalle", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

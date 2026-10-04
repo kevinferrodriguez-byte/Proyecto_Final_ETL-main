@@ -1,0 +1,119 @@
+table dm_escenarios_2050
+	lineageTag: 72636c31-6bbf-5e74-a247-eb3f06a61a5d
+
+	column anyo
+		dataType: int64
+		lineageTag: ad3e02ec-5fb8-5876-ab6c-a0de672aea88
+		summarizeBy: none
+		sourceColumn: anyo
+
+		annotation SummarizationSetBy = Automatic
+
+	column territorio
+		dataType: string
+		lineageTag: 6fe63e2e-536a-5153-9035-f0cfaa7b762d
+		summarizeBy: none
+		sourceColumn: territorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column escenario_kr
+		dataType: string
+		lineageTag: f302929f-eebf-5985-b845-b6dfeb693ccf
+		summarizeBy: none
+		sourceColumn: escenario_kr
+
+		annotation SummarizationSetBy = Automatic
+
+	column escenario
+		dataType: string
+		lineageTag: ab07437b-ead4-5fc1-a1d7-ffcd2f8f7187
+		summarizeBy: none
+		sourceColumn: escenario
+
+		annotation SummarizationSetBy = Automatic
+
+	column indicador
+		dataType: string
+		lineageTag: 535ce2c7-6972-5408-a1fe-1993ffcf1464
+		summarizeBy: none
+		sourceColumn: indicador
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_edad
+		dataType: string
+		lineageTag: 22ab4fb3-c72e-50fa-9865-f2aacb55b2dc
+		summarizeBy: none
+		sourceColumn: grupo_edad
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: double
+		lineageTag: 2941aae7-6593-502e-a574-31f820a8d14c
+		summarizeBy: none
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidad
+		dataType: string
+		lineageTag: 34421789-d8f9-53fa-85a1-ceb20539a012
+		summarizeBy: none
+		sourceColumn: unidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column diferencia_vs_base
+		dataType: double
+		lineageTag: 7f4e130a-aff3-565a-9949-4c705ff32324
+		summarizeBy: none
+		sourceColumn: diferencia_vs_base
+
+		annotation SummarizationSetBy = Automatic
+
+	column anyo_ultimo_observado
+		dataType: int64
+		lineageTag: 24d28dcd-4712-5776-9473-dacc2e9ff3a0
+		summarizeBy: none
+		sourceColumn: anyo_ultimo_observado
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor_ultimo_observado
+		dataType: double
+		lineageTag: 4b604222-21bb-54c3-8669-738c808ccfb0
+		summarizeBy: none
+		sourceColumn: valor_ultimo_observado
+
+		annotation SummarizationSetBy = Automatic
+
+	column variacion_vs_ultimo_observado
+		dataType: double
+		lineageTag: e7a27402-ee2e-5e6c-87c3-6d054a8ff36f
+		summarizeBy: none
+		sourceColumn: variacion_vs_ultimo_observado
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_run_id
+		dataType: string
+		lineageTag: 176eff67-ca8d-5455-8e4a-60025eb50c3e
+		summarizeBy: none
+		sourceColumn: gold_run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dm_escenarios_2050 = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dm_escenarios_2050.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"anyo", Int64.Type}, {"territorio", type text}, {"escenario_kr", type text}, {"escenario", type text}, {"indicador", type text}, {"grupo_edad", type text}, {"valor", type number}, {"unidad", type text}, {"diferencia_vs_base", type number}, {"anyo_ultimo_observado", Int64.Type}, {"valor_ultimo_observado", type number}, {"variacion_vs_ultimo_observado", type number}, {"gold_run_id", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

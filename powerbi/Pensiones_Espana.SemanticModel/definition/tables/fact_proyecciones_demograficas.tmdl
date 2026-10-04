@@ -1,0 +1,189 @@
+table fact_proyecciones_demograficas
+	lineageTag: 7cbb9539-37c9-5c4e-b578-593cedad7ce7
+
+	measure 'Valor proyectado' = SUM(fact_proyecciones_demograficas[valor])
+		formatString: #,0.00
+		displayFolder: Base
+		lineageTag: 638fcc42-8d52-5123-8e30-a23a079182c0
+
+	measure 'Indicador seleccionado' = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores")
+		displayFolder: Escenarios INE
+		lineageTag: 8661efdd-dfdc-551f-bf3b-16f172c388a9
+
+	measure 'Observado (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") RETURN CALCULATE([Valor observado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: f59e1018-1faa-5ebf-86c8-85723f99884e
+
+	measure 'Escenario base (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") RETURN CALCULATE([Valor proyectado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total", dim_escenario[escenario_kr] = "base")
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: 8b3ca481-7c4f-5ce1-9f08-7fbf0b838bd4
+
+	measure 'Escenario optimista (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") RETURN CALCULATE([Valor proyectado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total", dim_escenario[escenario_kr] = "optimista")
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: 7a012155-94a1-5e0c-9bcc-0341c27f17ee
+
+	measure 'Escenario pesimista (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") RETURN CALCULATE([Valor proyectado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total", dim_escenario[escenario_kr] = "pesimista")
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: 27ad4bfc-e65c-53bf-8349-50203bf3afcd
+
+	measure 'Proyección 2050 (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") RETURN CALCULATE([Valor proyectado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total", dim_tiempo[anyo] = 2050)
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: 8e798e4a-72d7-5dc2-921a-6df568f8874a
+
+	measure 'Último observado (selección)' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") VAR a = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = c, REMOVEFILTERS(dim_tiempo)) RETURN CALCULATE([Valor observado], dim_indicador[codigo_indicador] = c, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total", dim_tiempo[tiempo_key] = a)
+		formatString: 0.0
+		displayFolder: Escenarios INE
+		lineageTag: b81f4ec3-c518-5967-a4dd-51efea282971
+
+	measure 'Contexto · último observado' = VAR c = SELECTEDVALUE(sel_indicador_escenario[codigo], "tasa_dependencia_mayores") VAR a = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = c, REMOVEFILTERS(dim_tiempo)) RETURN "Último dato observado (" & a & ") · INE"
+		displayFolder: Escenarios INE
+		lineageTag: ab809cd4-1c8a-5d28-80e6-564724cb761d
+
+	measure 'Título · escenarios' = VAR nombre = SELECTEDVALUE(sel_indicador_escenario[nombre], "Dependencia de mayores (%)") VAR vmin = MINX(ALL(dim_escenario), [Proyección 2050 (selección)]) VAR vmax = MAXX(ALL(dim_escenario), [Proyección 2050 (selección)]) RETURN nombre & ": en 2050, entre " & FORMAT(vmin, "0.0") & " y " & FORMAT(vmax, "0.0") & " en los 8 escenarios oficiales del INE"
+		displayFolder: Títulos
+		lineageTag: e09b2ed6-0a52-5c5f-ab8c-25df2c3cb129
+
+	column tiempo_key
+		dataType: int64
+		isHidden
+		lineageTag: 2c7e3a74-0406-5de1-8a14-8e5f347a7e80
+		summarizeBy: none
+		sourceColumn: tiempo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column territorio_key
+		dataType: int64
+		isHidden
+		lineageTag: d832a5e1-182a-516e-b821-d954caa304ef
+		summarizeBy: none
+		sourceColumn: territorio_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column escenario_key
+		dataType: int64
+		isHidden
+		lineageTag: 01bd9332-da70-54d6-b4f0-f07feac5eedf
+		summarizeBy: none
+		sourceColumn: escenario_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column sexo_key
+		dataType: int64
+		isHidden
+		lineageTag: 3836ff1b-4a99-5e79-9662-4188b1ffdcb3
+		summarizeBy: none
+		sourceColumn: sexo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_edad_key
+		dataType: int64
+		isHidden
+		lineageTag: 60be3cf3-42d6-5339-a58a-633f0cded625
+		summarizeBy: none
+		sourceColumn: grupo_edad_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column indicador_key
+		dataType: int64
+		isHidden
+		lineageTag: 85857cbb-118f-5b67-9b62-e1677e0c3e93
+		summarizeBy: none
+		sourceColumn: indicador_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column fuente_key
+		dataType: int64
+		isHidden
+		lineageTag: 64b2d000-9438-5d56-b511-10b43ed0061a
+		summarizeBy: none
+		sourceColumn: fuente_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: double
+		lineageTag: 2e8d23aa-7ad5-5c71-83f8-ad140b18558e
+		summarizeBy: none
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidad
+		dataType: string
+		lineageTag: 70f09478-62d4-5822-9c3b-4960df6a0c4f
+		summarizeBy: none
+		sourceColumn: unidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado_dato
+		dataType: string
+		lineageTag: ca9ba9c6-5364-53ff-9c4c-a6d224c4c0a5
+		summarizeBy: none
+		sourceColumn: estado_dato
+
+		annotation SummarizationSetBy = Automatic
+
+	column metodologia
+		dataType: string
+		lineageTag: ba55bc77-2bb8-5e6c-a118-6d49eb81e720
+		summarizeBy: none
+		sourceColumn: metodologia
+
+		annotation SummarizationSetBy = Automatic
+
+	column dataset_origen
+		dataType: string
+		lineageTag: d9aa6c8d-6f51-5d9e-a394-37141f58651a
+		summarizeBy: none
+		sourceColumn: dataset_origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column run_id_origen
+		dataType: string
+		lineageTag: 52bf2286-f5e2-529e-99ba-98a7f0d64ff7
+		summarizeBy: none
+		sourceColumn: run_id_origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_run_id
+		dataType: string
+		lineageTag: 55b316f7-2cd8-5826-8d54-a167f1922b1e
+		summarizeBy: none
+		sourceColumn: gold_run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha_generacion
+		dataType: string
+		lineageTag: 5afd9b3b-2746-5c4d-934d-b0cd2b79b8f5
+		summarizeBy: none
+		sourceColumn: fecha_generacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_proyecciones_demograficas = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "fact_proyecciones_demograficas.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"tiempo_key", Int64.Type}, {"territorio_key", Int64.Type}, {"escenario_key", Int64.Type}, {"sexo_key", Int64.Type}, {"grupo_edad_key", Int64.Type}, {"indicador_key", Int64.Type}, {"fuente_key", Int64.Type}, {"valor", type number}, {"unidad", type text}, {"estado_dato", type text}, {"metodologia", type text}, {"dataset_origen", type text}, {"run_id_origen", type text}, {"gold_run_id", type text}, {"fecha_generacion", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

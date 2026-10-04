@@ -1,0 +1,77 @@
+table dim_tiempo
+	lineageTag: a9f097f4-9244-53c2-a98c-2e62241d0933
+
+	column tiempo_key
+		dataType: int64
+		lineageTag: fabf0676-1720-580b-b416-2a8623cdd589
+		summarizeBy: none
+		sourceColumn: tiempo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column anyo
+		dataType: int64
+		lineageTag: c67d4cd7-ac50-51a2-b010-5942e3607077
+		summarizeBy: none
+		sourceColumn: anyo
+
+		annotation SummarizationSetBy = Automatic
+
+	column decada
+		dataType: int64
+		lineageTag: c45fc94e-d40e-5a70-979e-fcbf20ec5bf4
+		summarizeBy: none
+		sourceColumn: decada
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha_inicio
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: e6738fec-7276-5bd4-a6fc-b1d167d70444
+		summarizeBy: none
+		sourceColumn: fecha_inicio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column fecha_fin
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: eb8bd08d-6f1c-5a05-a891-60ea56540dc6
+		summarizeBy: none
+		sourceColumn: fecha_fin
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column es_observado
+		dataType: boolean
+		lineageTag: 1c1af7d0-0954-5a66-bc0e-1fc10da5956c
+		summarizeBy: none
+		sourceColumn: es_observado
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_proyeccion
+		dataType: boolean
+		lineageTag: 7fe221c4-7644-5e90-8272-bcad179a8f5f
+		summarizeBy: none
+		sourceColumn: es_proyeccion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_tiempo = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_tiempo.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"tiempo_key", Int64.Type}, {"anyo", Int64.Type}, {"decada", Int64.Type}, {"fecha_inicio", type date}, {"fecha_fin", type date}, {"es_observado", type logical}, {"es_proyeccion", type logical}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

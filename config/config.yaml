@@ -1,0 +1,1289 @@
+project:
+    name: proyecto_final_etl
+    environment: development
+
+paths:
+    bronze: data/bronze
+    silver: data/silver
+    gold: data/gold
+    logs: logs
+
+pipeline:
+    date_format: '%Y-%m-%d'
+    write_mode: overwrite
+    runs_path: logs/ejecuciones
+    domains:
+        - ine
+        - seguridad_social
+        - sostenibilidad
+
+quality:
+    max_null_percentage: 0.05
+    min_temporal_completeness: 0.95
+
+output:
+    format: parquet
+    compression: snappy
+
+logging:
+    level: INFO
+    file: logs/etl.log
+    format: '%(asctime)s | %(tipo)s | %(name)s | %(message)s'
+
+sources:
+    ine:
+        name: Instituto Nacional de Estadística
+        language: ES
+        base_url: https://servicios.ine.es/wstempus/js
+
+        endpoints:
+            data_table: '{base_url}/{language}/DATOS_TABLA/{table_id}'
+            groups_table: '{base_url}/{language}/GRUPOS_TABLA/{table_id}'
+            group_values: '{base_url}/{language}/VALORES_GRUPOSTABLA/{table_id}/{group_id}'
+            variable: '{base_url}/{language}/VARIABLE/{variable_id}'
+
+        data_parameters:
+            tip: M
+
+        request:
+            timeout_seconds: 30
+            max_retries: 3
+            retry_backoff_seconds: 2
+            retry_on_status:
+                - 429
+                - 500
+                - 502
+                - 503
+                - 504
+
+        storage:
+            payloads_path: data/bronze/ine
+            manifests_path: data/bronze/ine/manifests
+            unmanifested_path: data/bronze/ine/_sin_manifiesto
+
+        enabled_tables:
+            - '56934'
+            - '6566'
+            - '24309'
+            - '69758'
+            - '36643'
+            - '36652'
+            - '1407'
+            - '1414'
+            - '1415'
+
+        filter_resolution:
+            source: metadata
+            label_match: exact
+            unresolved_filter_policy: fail
+
+        tables:
+            '56934':
+                name: Población por sexo y edad
+                operation: Estadística Continua de Población
+                native_frequency: trimestral
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 1971
+                    expected_end: 2025
+
+                filters:
+                    'Sexo':
+                        values:
+                            - 'Total'
+                            - 'Hombres'
+                            - 'Mujeres'
+
+                    'Edad simple':
+                        include_values_from_variable: 'Valores simples de edad'
+                        include_labels:
+                            - '105 y más años'
+                        expected_value_count: 106
+                        excluded_labels:
+                            - 'Todas las edades'
+                            - '85 y más años'
+                            - '100 y más años'
+
+                control_queries:
+                    - name: total_edad
+                      purpose: validar la suma de edades simples en Plata
+                      filters:
+                          'Sexo':
+                              values:
+                                  - 'Total'
+                                  - 'Hombres'
+                                  - 'Mujeres'
+                          'Edad simple':
+                              values:
+                                  - 'Todas las edades'
+                    - name: semiintervalos_edad
+                      purpose: completar la población con el tramo abierto vigente en periodos anteriores a julio de 2012
+                      filters:
+                          'Sexo':
+                              values:
+                                  - 'Total'
+                                  - 'Hombres'
+                                  - 'Mujeres'
+                          'Edad simple':
+                              values:
+                                  - '85 y más años'
+                                  - '100 y más años'
+
+            '6566':
+                name: Fenómenos demográficos por tipo de fenómeno demográfico
+                operation: Movimiento Natural de la Población
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 1992
+                    expected_end: 2024
+                filters:
+                    'Conceptos Demográficos':
+                        values:
+                            - 'Nacimiento'
+                            - 'Defunción'
+                source_behavior:
+                    duplicate_series_response: true
+                    bronze_action: preserve_as_received
+                    silver_action: deduplicate_before_consolidation
+                known_behaviors:
+                    - 'La API devuelve seis entradas: tres copias idénticas de MNP17544 (Nacimiento) y tres de MNP17542 (Defunción).'
+                    - 'El orden de las entradas varía entre ejecuciones; por eso el sha256 del payload cambia aunque el contenido sea idéntico.'
+
+            '24309':
+                name: Saldo migratorio con el extranjero
+                operation: Estadística de Migraciones
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 2008
+                    expected_end: 2021
+                filters:
+                    'Nacionalidad':
+                        values:
+                            - 'Total'
+                    'País de nacimiento':
+                        values:
+                            - 'Total'
+
+            '69758':
+                name: Saldos migratorios
+                operation: Estadística de Migraciones y Cambios de Residencia
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 2021
+                    expected_end: 2024
+                filters:
+                    'Nacionalidad':
+                        values:
+                            - 'Total'
+                    'Sexo':
+                        values:
+                            - 'Ambos sexos'
+                    'Tipo de saldo':
+                        values:
+                            - 'Saldo exterior'
+
+            '36643':
+                name: Población residente proyectada
+                operation: Proyecciones de Población
+                native_frequency: anual
+                data_state: proyectado
+                periods:
+                    mode: all_available
+                    expected_start: 2026
+                    expected_end: 2076
+                filters:
+                    'Sexo':
+                        values:
+                            - 'Total'
+                            - 'Hombres'
+                            - 'Mujeres'
+                    'Edad':
+                        include_values_from_variable: 'Valores simples de edad'
+                        include_labels:
+                            - '100 y más años'
+                        expected_value_count: 101
+                        excluded_labels:
+                            - 'Todas las edades'
+                control_queries:
+                    - name: total_edad
+                      purpose: validar la suma de edades detalladas en Plata
+                      filters:
+                          'Sexo':
+                              values:
+                                  - 'Total'
+                                  - 'Hombres'
+                                  - 'Mujeres'
+                          'Edad':
+                              values:
+                                  - 'Todas las edades'
+
+            '36652':
+                name: Escenarios de población residente proyectada
+                operation: Proyecciones de Población
+                native_frequency: anual
+                data_state: proyectado
+                periods:
+                    mode: all_available
+                    expected_start: 2026
+                    expected_end: 2076
+                filters:
+                    'Escenario':
+                        values:
+                            - 'Central'
+                            - 'Fecundidad alta'
+                            - 'Fecundidad baja'
+                            - 'Saldo migratorio alto'
+                            - 'Saldo migratorio bajo'
+                            - 'Fecundidad y saldo migratorio altos'
+                            - 'Fecundidad y saldo migratorio bajos'
+                            - 'Saldo migratorio nulo'
+                    'Sexo':
+                        values:
+                            - 'Total'
+                            - 'Hombres'
+                            - 'Mujeres'
+                    'Edad':
+                        include_values_from_variable: 'Valores simples de edad'
+                        include_labels:
+                            - '100 y más años'
+                        expected_value_count: 101
+                        excluded_labels:
+                            - 'Todas las edades'
+                control_queries:
+                    - name: total_edad
+                      purpose: validar la suma de edades detalladas en Plata
+                      filters:
+                          'Escenario':
+                              values:
+                                  - 'Central'
+                                  - 'Fecundidad alta'
+                                  - 'Fecundidad baja'
+                                  - 'Saldo migratorio alto'
+                                  - 'Saldo migratorio bajo'
+                                  - 'Fecundidad y saldo migratorio altos'
+                                  - 'Fecundidad y saldo migratorio bajos'
+                                  - 'Saldo migratorio nulo'
+                          'Sexo':
+                              values:
+                                  - 'Total'
+                                  - 'Hombres'
+                                  - 'Mujeres'
+                          'Edad':
+                              values:
+                                  - 'Todas las edades'
+
+            # Indicadores Demográficos Básicos (IDB): indicadores publicados por el INE, no recalculados.
+            '1407':
+                name: Indicador Coyuntural de Fecundidad según orden del nacimiento y nacionalidad de la madre
+                operation: Indicadores Demográficos Básicos
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 1975
+                    expected_end: 2024
+                filters:
+                    'Totales Territoriales':
+                        values:
+                            - 'Total Nacional'
+                    'Nacionalidad':
+                        values:
+                            - 'Ambas nacionalidades'
+                    'Orden de nacimiento':
+                        values:
+                            - 'Todos'
+
+            '1414':
+                name: Esperanza de Vida al Nacimiento según sexo
+                operation: Indicadores Demográficos Básicos
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 1975
+                    expected_end: 2024
+                filters:
+                    'Totales Territoriales':
+                        values:
+                            - 'Total Nacional'
+                    'Sexo':
+                        values:
+                            - 'Ambos sexos'
+                            - 'Hombres'
+                            - 'Mujeres'
+
+            '1415':
+                name: Esperanza de Vida a los 65 años según sexo
+                operation: Indicadores Demográficos Básicos
+                native_frequency: anual
+                data_state: observado
+                periods:
+                    mode: all_available
+                    expected_start: 1975
+                    expected_end: 2024
+                filters:
+                    'Totales Territoriales':
+                        values:
+                            - 'Total Nacional'
+                    'Sexo':
+                        values:
+                            - 'Ambos sexos'
+                            - 'Hombres'
+                            - 'Mujeres'
+
+        reconciliation:
+            migration_overlap:
+                period: 2021
+                preferred_table_id: '69758'
+                non_preferred_table_id: '24309'
+                rule: 'Conservar ambos payloads en Bronce; usar 69758 como fuente canónica desde Plata.'
+
+    seguridad_social:
+        name: Seguridad Social
+
+        request:
+            timeout_seconds: 60
+            max_retries: 3
+            retry_backoff_seconds: 2
+            retry_on_status:
+                - 429
+                - 500
+                - 502
+                - 503
+                - 504
+
+        storage:
+            payloads_path: data/bronze/seguridad_social
+            manifests_path: data/bronze/seguridad_social/manifests
+            unmanifested_path: data/bronze/seguridad_social/_sin_manifiesto
+
+        enabled_files:
+            - afiliados_alta
+            - pensionistas_nomina
+
+        # Las URL incluyen el mes de publicación: se actualizan cuando la Seguridad Social publica un nuevo archivo.
+        files:
+            afiliados_alta:
+                name: Serie de afiliados en alta por regímenes (último día del mes)
+                publisher: Tesorería General de la Seguridad Social
+                # Publicación: serie 1985 – agosto de 2026 (descargada en septiembre de 2026).
+                url: https://www.seg-social.es/wps/wcm/connect/wss/7df0ea77-8812-4721-aec2-00eeaef5036f/Serie+Afiliados+Ultimo+D%C3%ADa+por+Reg%C3%ADmenes+1985-agosto+2026.xlsx?MOD=AJPERES&CONVERT_TO=linktext&CACHEID=ROOTWORKSPACE.Z18_2G50H38209D640QTQ57OVB2000-7df0ea77-8812-4721-aec2-00eeaef5036f-q1wTj4L
+                extension: xlsx
+                sheet: Hoja1
+                native_frequency: mensual
+                data_state: observado
+            pensionistas_nomina:
+                name: Avance mensual de pensiones contributivas del sistema
+                publisher: Instituto Nacional de la Seguridad Social
+                # Publicación: avance mensual de septiembre de 2026 (prefijo 202609_).
+                url: https://www.seg-social.es/wps/wcm/connect/wss/d8a9c4fd-04ac-4814-9bae-6971cdb35250/202609_Avance+mensual.xlsx?MOD=AJPERES&CONVERT_TO=linktext&CACHEID=ROOTWORKSPACE.Z18_2G50H38209D640QTQ57OVB2000-d8a9c4fd-04ac-4814-9bae-6971cdb35250-q3nnjGK
+                extension: xlsx
+                sheet: 'Nº Pens. Clases'
+                # Hojas adicionales que Bronce exige antes de guardar el libro (Plata las lee).
+                additional_sheets:
+                    - 'Importe €'
+                native_frequency: anual a diciembre y mensual reciente
+                data_state: observado
+
+    # Tercera fuente núcleo: Eurostat (API de difusión, JSON-stat 2.0). Aporta el PIB y el gasto en pensiones
+    # en el mismo marco (SEC 2010 / ESSPROS), de modo que gasto_pensiones_pib es un cociente coherente y
+    # verificable contra el porcentaje que publica la propia Eurostat. demo_pjan solo se usa como control
+    # de consistencia de la población del INE (Eurostat la recibe del INE).
+    eurostat:
+        name: Eurostat
+        base_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data
+        common_parameters:
+            format: JSON
+            lang: EN
+        request:
+            timeout_seconds: 90
+            max_retries: 3
+            retry_backoff_seconds: 3
+            retry_on_status:
+                - 429
+                - 500
+                - 502
+                - 503
+                - 504
+        storage:
+            payloads_path: data/bronze/eurostat
+            manifests_path: data/bronze/eurostat/manifests
+            unmanifested_path: data/bronze/eurostat/_sin_manifiesto
+        territories:
+            ES: ES
+        # Flags de Eurostat con su estado de dato. Un flag no listado detiene Plata (mapeo estricto).
+        status_flags:
+            p: provisional
+            e: provisional
+            b: observado
+            d: observado
+        enabled_datasets:
+            - pib
+            - gasto_pensiones
+            - poblacion_control
+        datasets:
+            pib:
+                code: nama_10_gdp
+                name: Producto interior bruto a precios de mercado, precios corrientes
+                filters:
+                    geo: ES
+                    freq: A
+                    na_item: B1GQ
+                    unit: CP_MEUR
+                metrics:
+                    dimension: unit
+                    values:
+                        CP_MEUR:
+                            metrica: pib
+                            unidad: millones_eur
+                            tipo_medida: flujo_anual
+                periods:
+                    expected_start: 1995
+                    expected_end: 2025
+            gasto_pensiones:
+                code: spr_exp_pens
+                name: Gasto en pensiones (ESSPROS), total de tipos de pensión
+                filters:
+                    geo: ES
+                    freq: A
+                    spdepb: TOTAL
+                    spdepm: TOTAL
+                    unit:
+                        - MIO_EUR
+                        - PC_GDP
+                metrics:
+                    dimension: unit
+                    values:
+                        MIO_EUR:
+                            metrica: gasto_pensiones
+                            unidad: millones_eur
+                            tipo_medida: flujo_anual
+                        PC_GDP:
+                            metrica: gasto_pensiones_pib_publicado
+                            unidad: porcentaje_pib
+                            tipo_medida: ratio_anual
+                periods:
+                    expected_start: 1995
+                    expected_end: 2024
+            poblacion_control:
+                code: demo_pjan
+                name: Población a 1 de enero (control de consistencia con el INE)
+                filters:
+                    geo: ES
+                    freq: A
+                    age: TOTAL
+                    sex: T
+                    unit: NR
+                metrics:
+                    dimension: unit
+                    values:
+                        NR:
+                            metrica: poblacion_1_enero
+                            unidad: personas
+                            tipo_medida: stock_1_enero
+                periods:
+                    expected_start: 1971
+                    expected_end: 2025
+        valid_ranges:
+            pib:
+                min: 100000
+                max: 10000000
+            gasto_pensiones:
+                min: 1000
+                max: 1000000
+            gasto_pensiones_pib_publicado:
+                min: 0
+                max: 30
+            poblacion_1_enero:
+                min: 20000000
+                max: 70000000
+
+    # Banco de España: evaluado y no incorporado al MVP (ver docs/03_fuentes_datos.md). Su API
+    # (app.bde.es/bierest) redistribuye el PIB de la Contabilidad Nacional del INE y no publica
+    # el gasto en pensiones ESSPROS; se deja como extensión para IPC y deuda pública.
+
+silver:
+    dataset_name: stg_poblacion_anual
+    manifests_path: data/silver/manifests
+
+    ine:
+        timezone: Europe/Madrid
+        accepted_fk_tipo_dato:
+            - 1
+        homologated_top_age: 100
+        annual_reference:
+            month: 1
+            day: 1
+
+        variables:
+            sexo: 18
+            territorio: 349
+            edad:
+                355: simple
+                356: total
+                357: tramo_abierto
+
+        labels:
+            sexo:
+                'Total': total
+                'Ambos sexos': total
+                'Hombres': hombres
+                'Mujeres': mujeres
+            territorio:
+                'Total Nacional': ES
+            escenario:
+                'Central': central
+                'Fecundidad alta': fecundidad_alta
+                'Fecundidad baja': fecundidad_baja
+                'Saldo migratorio alto': saldo_migratorio_alto
+                'Saldo migratorio bajo': saldo_migratorio_bajo
+                'Fecundidad y saldo migratorio altos': fecundidad_y_saldo_migratorio_altos
+                'Fecundidad y saldo migratorio bajos': fecundidad_y_saldo_migratorio_bajos
+                'Saldo migratorio nulo': saldo_migratorio_nulo
+
+        units:
+            3: personas
+            108: anos
+            110: hijos_por_mujer
+            120: nacimientos
+            122: defunciones
+            155: movimientos_migratorios
+            420: migraciones
+
+        implicit_dimensions:
+            sexo: total
+            territorio: ES
+            edad_etiqueta: Todas las edades
+
+        tables:
+            '56934':
+                implicit_dimensions: []
+                concept_variable: 260
+                concepts:
+                    'Población': poblacion
+                escenario: observado
+                constant_variables:
+                    3:
+                        - 'Número'
+            '6566':
+                implicit_dimensions: [sexo, edad]
+                concept_variable: 260
+                concepts:
+                    'Nacimiento': nacimientos
+                    'Defunción': defunciones
+                escenario: observado
+                constant_variables:
+                    3:
+                        - 'Dato base'
+            '24309':
+                implicit_dimensions: [sexo, edad]
+                concept_variable: 260
+                concepts:
+                    'Saldo con el extranjero': saldo_migratorio_exterior
+                escenario: observado
+                constant_variables:
+                    141:
+                        - 'Total'
+                    431:
+                        - 'Total'
+            '69758':
+                implicit_dimensions: [territorio, edad]
+                concept_variable: 876
+                concepts:
+                    'Saldo exterior': saldo_migratorio_exterior
+                escenario: observado
+                constant_variables:
+                    141:
+                        - 'Total'
+                    3:
+                        - 'Dato base'
+            '36643':
+                implicit_dimensions: []
+                concept_variable: 260
+                concepts:
+                    'Población': poblacion
+                escenario: central
+                constant_variables:
+                    3:
+                        - 'Proyección a largo plazo'
+            '36652':
+                implicit_dimensions: []
+                concept_variable: 260
+                concepts:
+                    'Población': poblacion
+                scenario_variable: 876
+                excluded_scenarios:
+                    - central
+                constant_variables:
+                    3:
+                        - 'Proyección a largo plazo'
+            # En las tablas IDB la edad es una constante del indicador (0 o 65 años), no una dimensión:
+            # se declara en constant_variables y la métrica la identifica.
+            '1407':
+                implicit_dimensions: [sexo, edad]
+                concept_variable: 260
+                concepts:
+                    'Indicador coyuntural de fecundidad': indicador_coyuntural_fecundidad
+                escenario: observado
+                constant_variables:
+                    259:
+                        - 'Fecundidad'
+                    310:
+                        - 'Anual'
+                    3:
+                        - 'Dato base'
+                    141:
+                        - 'Ambas nacionalidades'
+                    452:
+                        - 'Todos'
+            '1414':
+                implicit_dimensions: [edad]
+                concept_variable: 260
+                concepts:
+                    'Esperanza de vida': esperanza_vida_nacimiento
+                escenario: observado
+                constant_variables:
+                    259:
+                        - 'Mortalidad'
+                    355:
+                        - '0 años'
+                    310:
+                        - 'Anual'
+                    3:
+                        - 'Dato base'
+            '1415':
+                implicit_dimensions: [edad]
+                concept_variable: 260
+                concepts:
+                    'Esperanza de vida': esperanza_vida_65
+                escenario: observado
+                constant_variables:
+                    259:
+                        - 'Mortalidad'
+                    355:
+                        - '65 años'
+                    310:
+                        - 'Anual'
+                    3:
+                        - 'Dato base'
+
+    seguridad_social:
+        output_path: data/silver/mercado_laboral_pensiones
+        manifests_path: data/silver/mercado_laboral_pensiones/manifests
+        territorio: ES
+
+        afiliados:
+            dataset_name: stg_afiliados_mensual
+            source_file: afiliados_alta
+            period_header: Periodo
+            total_header: TOTAL SISTEMA
+            reference_day: ultimo_dia_mes
+            periods:
+                expected_start: '1985-01'
+                expected_end: '2026-08'
+
+        pensiones:
+            dataset_name: stg_pensiones_cuantia
+            source_file: pensionistas_nomina
+            period_header: PERIODO
+            end_marker: '% de variación anual'
+            reference_day: primer_dia_mes
+            annual_reference:
+                month: 12
+                source_note: 'Datos anuales a diciembre de cada año.'
+            columns:
+                'INCAPACIDAD PERMANENTE': pensiones_incapacidad_permanente
+                'JUBILACIÓN': pensiones_jubilacion
+                'VIUDEDAD': pensiones_viudedad
+                'ORFANDAD': pensiones_orfandad
+                'F. FAMILIAR': pensiones_favor_familiar
+                'TOTAL': total_pensiones
+            periods:
+                annual_expected_start: 2016
+                annual_expected_end: 2025
+                monthly_expected_start: '2025-01'
+                monthly_expected_end: '2026-09'
+
+        # Importe mensual de la nómina de pensiones contributivas (miles de euros), misma estructura que el número de pensiones.
+        importe:
+            dataset_name: stg_pensiones_importe
+            source_file: pensionistas_nomina
+            sheet: 'Importe €'
+            value_type: amount
+            unidad: miles_eur
+            period_header: PERIODO
+            end_marker: '% de variación anual'
+            reference_day: primer_dia_mes
+            annual_reference:
+                month: 12
+                source_note: 'Datos anuales a diciembre de cada año.'
+            columns:
+                'INCAPACIDAD PERMANENTE': importe_incapacidad_permanente
+                'JUBILACIÓN': importe_jubilacion
+                'VIUDEDAD': importe_viudedad
+                'ORFANDAD': importe_orfandad
+                'F. FAMILIAR': importe_favor_familiar
+                'TOTAL': importe_total
+            # Tolerancia absoluta (miles de euros) al comparar la suma de clases con el total publicado.
+            sum_tolerance: 0.01
+            periods:
+                annual_expected_start: 2016
+                annual_expected_end: 2025
+                monthly_expected_start: '2025-01'
+                monthly_expected_end: '2026-09'
+
+    validation:
+        age_total_tolerances:
+            - table_id: '56934'
+              before: '2012-07-01'
+              max_abs_difference: 16
+        default_max_abs_difference: 0
+        float_epsilon: 0.000001
+
+    eurostat:
+        dataset_name: stg_macro_anual
+        output_path: data/silver/macro
+        manifests_path: data/silver/macro/manifests
+
+# ════════════════════════════════════════════════════════════════════════════
+# ORO · 1) CAPA DE INDICADORES (data/gold/indicadores)
+# Calcula los KPIs a partir de Plata. Cada conjunto tiene manifiesto y reporte de calidad propios.
+# ════════════════════════════════════════════════════════════════════════════
+indicadores:
+    output_path: data/gold/indicadores
+
+    # KPIs de estructura demográfica y crecimiento natural (INE); observado y proyectado.
+    demografia:
+        dataset_name: kpis_demograficos
+        manifests_path: data/gold/indicadores/manifests_demografia
+        float_epsilon: 0.000001
+        age_groups:
+            young_max_age: 15
+            working_min_age: 16
+            working_max_age: 64
+            elderly_min_age: 65
+        units:
+            indice_envejecimiento: porcentaje
+            tasa_dependencia: porcentaje
+            tasa_dependencia_mayores: porcentaje
+            porcentaje_mayores_65: porcentaje
+            saldo_vegetativo: personas
+        escenario_kr:
+            observado: observado
+            central: base
+            fecundidad_y_saldo_migratorio_altos: optimista
+            fecundidad_y_saldo_migratorio_bajos: pesimista
+            fecundidad_alta: sensibilidad
+            fecundidad_baja: sensibilidad
+            saldo_migratorio_alto: sensibilidad
+            saldo_migratorio_bajo: sensibilidad
+            saldo_migratorio_nulo: sensibilidad
+
+    # Ratio afiliados/pensión y pensión media (Seguridad Social), stock de diciembre.
+    pensiones:
+        dataset_name: kpi_ratio_sostenibilidad_anual
+        manifests_path: data/gold/indicadores/manifests_pensiones
+        methodology: stock_diciembre
+        reference_month: 12
+        expected_start: 2016
+        expected_end: 2025
+        float_epsilon: 0.000001
+
+    # KPIs que cruzan fuentes: gasto en pensiones/PIB (Eurostat) y tasa de afiliación (Seguridad Social + INE).
+    integrados:
+        dataset_name: kpis_integrados_anual
+        manifests_path: data/gold/indicadores/manifests_integrados
+        float_epsilon: 0.000001
+        # Diferencia máxima (puntos porcentuales) entre gasto/PIB calculado y el porcentaje publicado por
+        # Eurostat. El publicado se redondea a 2 decimales (error máximo 0,005 pp, observado en 1995-2024);
+        # superar 0,01 pp indica otra añada del PIB y se registra como advertencia, sin detener el pipeline.
+        max_diferencia_publicado_pp: 0.01
+        # La afiliación a 31/12 del año t se relaciona con la población a 1/1 del año t+1 (un día de distancia).
+        afiliacion_desfase_poblacion_anyos: 1
+
+# ════════════════════════════════════════════════════════════════════════════
+# ORO · 2) MODELO DIMENSIONAL (data/gold/modelo) · solo datos OBSERVADOS
+# ════════════════════════════════════════════════════════════════════════════
+modelo:
+    output_path: data/gold/modelo
+    manifests_path: data/gold/modelo/manifests
+    float_epsilon: 0.000001
+
+    territories:
+        ES:
+            key: 1
+            name: España
+            level: nacional
+
+    sexes:
+        total: {key: 0, name: Ambos sexos}
+        hombres: {key: 1, name: Hombres}
+        mujeres: {key: 2, name: Mujeres}
+
+    # Catálogo de fuentes (dim_fuente). Documenta la procedencia de cada hecho.
+    sources:
+        ine:
+            key: 1
+            organismo: Instituto Nacional de Estadística (INE)
+            acceso: API JSON Tempus3 (servicios.ine.es/wstempus/js)
+            url: https://www.ine.es/dyngs/DAB/index.htm?cid=1099
+            conjuntos: 'Tablas 56934, 6566, 24309, 69758, 1407, 1414 y 1415 (observado); 36643 y 36652 (proyecciones)'
+        seguridad_social:
+            key: 2
+            organismo: Ministerio de Inclusión, Seguridad Social y Migraciones (TGSS e INSS)
+            acceso: Descarga de libros XLSX del portal estadístico de la Seguridad Social
+            url: https://www.seg-social.es/wps/portal/wss/internet/EstadisticasPresupuestosEstudios/Estadisticas
+            conjuntos: 'Serie de afiliados en alta (último día del mes); Avance mensual de pensiones contributivas'
+        eurostat:
+            key: 3
+            organismo: Eurostat (Oficina Estadística de la Unión Europea)
+            acceso: API de difusión JSON-stat 2.0 (ec.europa.eu/eurostat/api/dissemination)
+            url: https://ec.europa.eu/eurostat/web/main/data/database
+            conjuntos: 'nama_10_gdp (PIB), spr_exp_pens (gasto en pensiones ESSPROS) y demo_pjan (control)'
+        integrado:
+            key: 4
+            organismo: Cálculo del pipeline a partir de fuentes oficiales de distinto organismo
+            acceso: Capa de indicadores (data/gold/indicadores/kpis_integrados_anual)
+            url: 'docs/05_diccionario_metricas.md'
+            conjuntos: 'Cociente de series oficiales de distinta fuente (ver la columna metodologia)'
+
+    # Catálogo de indicadores = dim_indicador = diccionario de métricas.
+    # tipo: kpi (8 KPIs del proyecto), contexto (apoyan la interpretación) o metrica_base (componentes).
+    # cobertura: años observados esperados; completitud = años presentes / esperados (KR 1.2).
+    # rango: límites de plausibilidad (regla de rangos válidos). sentido: lectura para el tablero.
+    indicators:
+        indice_envejecimiento:
+            key: 1
+            nombre: Índice de envejecimiento
+            tipo: kpi
+            codigo_kpi: KPI-01
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: porcentaje
+            formula: 'poblacion(65+) / poblacion(0-15) × 100'
+            fuente: ine
+            origen: kpis_demograficos
+            referencia_temporal: 1 de enero
+            desagregaciones: [territorio]
+            cobertura: {desde: 1971, hasta: 2025}
+            rango: {min: 0, max: 1000}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Personas de 65 y más años por cada 100 menores de 16. Mide el envejecimiento de la estructura por edad.
+        tasa_dependencia:
+            key: 2
+            nombre: Tasa de dependencia demográfica
+            tipo: kpi
+            codigo_kpi: KPI-02
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: porcentaje
+            formula: '(poblacion(0-15) + poblacion(65+)) / poblacion(16-64) × 100'
+            fuente: ine
+            origen: kpis_demograficos
+            referencia_temporal: 1 de enero
+            desagregaciones: [territorio]
+            cobertura: {desde: 1971, hasta: 2025}
+            rango: {min: 0, max: 200}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Población en edades potencialmente inactivas por cada 100 personas en edad de trabajar (16-64).
+        tasa_dependencia_mayores:
+            key: 3
+            nombre: Tasa de dependencia de mayores
+            tipo: kpi
+            codigo_kpi: KPI-03
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: porcentaje
+            formula: 'poblacion(65+) / poblacion(16-64) × 100'
+            fuente: ine
+            origen: kpis_demograficos
+            referencia_temporal: 1 de enero
+            desagregaciones: [territorio]
+            cobertura: {desde: 1971, hasta: 2025}
+            rango: {min: 0, max: 200}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Personas de 65 y más años por cada 100 personas de 16 a 64 años. Aproxima la presión demográfica sobre un sistema de reparto.
+        indicador_coyuntural_fecundidad:
+            key: 4
+            nombre: Indicador coyuntural de fecundidad
+            tipo: kpi
+            codigo_kpi: KPI-04
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: hijos_por_mujer
+            formula: 'Σ tasas específicas de fecundidad por edad de la madre (publicado por el INE, no recalculado)'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 1407)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1975, hasta: 2024}
+            rango: {min: 0.5, max: 5}
+            sentido: menor_es_mas_riesgo
+            descripcion: Número medio de hijos por mujer si se mantuvieran las tasas de fecundidad por edad del año. Umbral de reemplazo aproximado de 2,1.
+        saldo_vegetativo:
+            key: 5
+            nombre: Saldo vegetativo
+            tipo: kpi
+            codigo_kpi: KPI-05
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: personas
+            formula: 'nacimientos - defunciones'
+            fuente: ine
+            origen: kpis_demograficos
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1992, hasta: 2024}
+            rango: {min: -1000000, max: 1000000}
+            sentido: menor_es_mas_riesgo
+            descripcion: Crecimiento natural de la población. Negativo cuando las defunciones superan a los nacimientos.
+        saldo_migratorio_exterior:
+            key: 6
+            nombre: Saldo migratorio con el extranjero
+            tipo: kpi
+            codigo_kpi: KPI-06
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: 'movimientos_migratorios (hasta 2020) / migraciones (desde 2021)'
+            formula: 'inmigraciones procedentes del extranjero - emigraciones con destino al extranjero (publicado por el INE)'
+            fuente: ine
+            origen: stg_poblacion_anual (tablas 24309 y 69758)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 2008, hasta: 2024}
+            rango: {min: -2000000, max: 2000000}
+            sentido: neutro
+            descripcion: Crecimiento migratorio neto con el extranjero. Ruptura de serie en 2021 (cambio de operación estadística del INE).
+        ratio_cotizantes_pensionistas:
+            key: 7
+            nombre: Ratio afiliados en alta por pensión contributiva
+            tipo: kpi
+            codigo_kpi: KPI-07
+            okr: O2
+            pestana: cotizacion_pensiones
+            dominio: pensiones
+            unidad: afiliados_por_pension
+            formula: 'afiliados en alta a 31/12 / pensiones contributivas en vigor a 1/12'
+            fuente: seguridad_social
+            origen: kpi_ratio_sostenibilidad_anual
+            referencia_temporal: diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 2016, hasta: 2025}
+            rango: {min: 0.5, max: 10}
+            sentido: menor_es_mas_riesgo
+            descripcion: Aproximación oficial al ratio cotizantes/pensionistas. El denominador son pensiones (una persona puede cobrar más de una), no pensionistas.
+        gasto_pensiones_pib:
+            key: 8
+            nombre: Gasto en pensiones sobre el PIB
+            tipo: kpi
+            codigo_kpi: KPI-08
+            okr: O2
+            pestana: sostenibilidad_financiera
+            dominio: macroeconomia
+            unidad: porcentaje_pib
+            formula: 'gasto en pensiones ESSPROS (millones EUR) / PIB a precios corrientes (millones EUR) × 100'
+            fuente: eurostat
+            origen: kpis_integrados_anual
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1995, hasta: 2024}
+            rango: {min: 0, max: 30}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Esfuerzo de gasto en pensiones (vejez, jubilación anticipada, parcial, invalidez y supervivencia; ESSPROS) en relación con la economía.
+        porcentaje_mayores_65:
+            key: 9
+            nombre: Proporción de población de 65 y más años
+            tipo: contexto
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: porcentaje
+            formula: 'poblacion(65+) / poblacion total × 100'
+            fuente: ine
+            origen: kpis_demograficos
+            referencia_temporal: 1 de enero
+            desagregaciones: [territorio]
+            cobertura: {desde: 1971, hasta: 2025}
+            rango: {min: 0, max: 100}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Peso de la población mayor sobre el total.
+        esperanza_vida_nacimiento:
+            key: 10
+            nombre: Esperanza de vida al nacimiento
+            tipo: contexto
+            okr: O2
+            pestana: demografia
+            dominio: demografia
+            unidad: anos
+            formula: 'publicado por el INE (tablas de mortalidad), no recalculado'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 1414)
+            referencia_temporal: año natural
+            desagregaciones: [territorio, sexo]
+            cobertura: {desde: 1975, hasta: 2024}
+            rango: {min: 60, max: 100}
+            sentido: neutro
+            descripcion: Años que viviría en promedio una persona recién nacida con la mortalidad por edad del año.
+        esperanza_vida_65:
+            key: 11
+            nombre: Esperanza de vida a los 65 años
+            tipo: contexto
+            okr: O2
+            pestana: cotizacion_pensiones
+            dominio: demografia
+            unidad: anos
+            formula: 'publicado por el INE (tablas de mortalidad), no recalculado'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 1415)
+            referencia_temporal: año natural
+            desagregaciones: [territorio, sexo]
+            cobertura: {desde: 1975, hasta: 2024}
+            rango: {min: 10, max: 35}
+            sentido: mayor_es_mas_riesgo
+            descripcion: Años que quedan por vivir en promedio a los 65; aproxima la duración media de una pensión de jubilación.
+        tasa_afiliacion_16_64:
+            key: 12
+            nombre: Afiliados por cada 100 personas de 16 a 64 años
+            tipo: contexto
+            okr: O2
+            pestana: cotizacion_pensiones
+            dominio: mercado_laboral
+            unidad: porcentaje
+            formula: 'afiliados en alta a 31/12 del año t / poblacion(16-64) a 1/1 del año t+1 × 100'
+            fuente: integrado
+            origen: kpis_integrados_anual
+            referencia_temporal: 31 de diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 1985, hasta: 2024}
+            rango: {min: 0, max: 150}
+            sentido: menor_es_mas_riesgo
+            descripcion: Relaciona la base de cotizantes con la población en edad de trabajar. No es una tasa de empleo (incluye pluriempleo y afiliados fuera de 16-64).
+        pension_media_mensual:
+            key: 13
+            nombre: Pensión contributiva media mensual
+            tipo: contexto
+            okr: O2
+            pestana: sostenibilidad_financiera
+            dominio: pensiones
+            unidad: eur_mes
+            formula: 'importe de la nómina mensual (miles EUR) × 1000 / número de pensiones'
+            fuente: seguridad_social
+            origen: kpi_ratio_sostenibilidad_anual
+            referencia_temporal: diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 2016, hasta: 2025}
+            rango: {min: 100, max: 5000}
+            sentido: neutro
+            descripcion: Importe medio por pensión contributiva en vigor en diciembre (nómina ordinaria, sin pagas extraordinarias).
+        poblacion:
+            key: 14
+            nombre: Población residente a 1 de enero
+            tipo: metrica_base
+            okr: O1
+            pestana: demografia
+            dominio: demografia
+            unidad: personas
+            formula: 'suma de la población por edad simple (Estadística Continua de Población)'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 56934)
+            referencia_temporal: 1 de enero
+            desagregaciones: [territorio, sexo, grupo_edad]
+            cobertura: {desde: 1971, hasta: 2025}
+            rango: {min: 0, max: 100000000}
+            sentido: neutro
+            descripcion: Stock de población; numerador y denominador de los KPIs de estructura.
+        nacimientos:
+            key: 15
+            nombre: Nacimientos
+            tipo: metrica_base
+            okr: O1
+            pestana: demografia
+            dominio: demografia
+            unidad: nacimientos
+            formula: 'publicado por el INE (Movimiento Natural de la Población)'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 6566)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1992, hasta: 2024}
+            rango: {min: 0, max: 2000000}
+            sentido: neutro
+            descripcion: Nacidos vivos de madre residente en España.
+        defunciones:
+            key: 16
+            nombre: Defunciones
+            tipo: metrica_base
+            okr: O1
+            pestana: demografia
+            dominio: demografia
+            unidad: defunciones
+            formula: 'publicado por el INE (Movimiento Natural de la Población)'
+            fuente: ine
+            origen: stg_poblacion_anual (tabla 6566)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1992, hasta: 2024}
+            rango: {min: 0, max: 2000000}
+            sentido: neutro
+            descripcion: Defunciones de residentes en España.
+        total_afiliados:
+            key: 17
+            nombre: Afiliados en alta a la Seguridad Social (31 de diciembre)
+            tipo: metrica_base
+            okr: O1
+            pestana: cotizacion_pensiones
+            dominio: mercado_laboral
+            unidad: afiliados
+            formula: 'afiliados en alta laboral el último día de diciembre (TOTAL SISTEMA)'
+            fuente: seguridad_social
+            origen: stg_afiliados_mensual
+            referencia_temporal: 31 de diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 1985, hasta: 2025}
+            rango: {min: 0, max: 40000000}
+            sentido: neutro
+            descripcion: Numerador del ratio afiliados/pensión. Cuenta situaciones de alta (una persona puede tener varias).
+        total_pensiones:
+            key: 18
+            nombre: Pensiones contributivas en vigor (1 de diciembre)
+            tipo: metrica_base
+            okr: O1
+            pestana: cotizacion_pensiones
+            dominio: pensiones
+            unidad: pensiones
+            formula: 'suma de pensiones de incapacidad permanente, jubilación, viudedad, orfandad y favor familiar'
+            fuente: seguridad_social
+            origen: kpi_ratio_sostenibilidad_anual
+            referencia_temporal: diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 2016, hasta: 2025}
+            rango: {min: 0, max: 20000000}
+            sentido: neutro
+            descripcion: Denominador del ratio afiliados/pensión.
+        importe_nomina_pensiones:
+            key: 19
+            nombre: Importe mensual de la nómina de pensiones contributivas
+            tipo: metrica_base
+            okr: O1
+            pestana: sostenibilidad_financiera
+            dominio: pensiones
+            unidad: miles_eur
+            formula: 'importe de la nómina mensual de diciembre (TOTAL), publicado por el INSS'
+            fuente: seguridad_social
+            origen: kpi_ratio_sostenibilidad_anual
+            referencia_temporal: diciembre
+            desagregaciones: [territorio]
+            cobertura: {desde: 2016, hasta: 2025}
+            rango: {min: 0, max: 100000000}
+            sentido: neutro
+            descripcion: Gasto mensual en nómina ordinaria; no es el gasto anual (excluye pagas extraordinarias y atrasos).
+        pib:
+            key: 20
+            nombre: Producto interior bruto a precios corrientes
+            tipo: metrica_base
+            okr: O1
+            pestana: sostenibilidad_financiera
+            dominio: macroeconomia
+            unidad: millones_eur
+            formula: 'B1GQ a precios de mercado, precios corrientes (SEC 2010)'
+            fuente: eurostat
+            origen: stg_macro_anual (nama_10_gdp)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1995, hasta: 2025}
+            rango: {min: 100000, max: 10000000}
+            sentido: neutro
+            descripcion: Denominador de gasto_pensiones_pib. Los últimos años son provisionales.
+        gasto_pensiones:
+            key: 21
+            nombre: Gasto en pensiones (ESSPROS)
+            tipo: metrica_base
+            okr: O1
+            pestana: sostenibilidad_financiera
+            dominio: macroeconomia
+            unidad: millones_eur
+            formula: 'gasto total en pensiones del Sistema Europeo de Estadísticas Integradas de Protección Social'
+            fuente: eurostat
+            origen: stg_macro_anual (spr_exp_pens)
+            referencia_temporal: año natural
+            desagregaciones: [territorio]
+            cobertura: {desde: 1990, hasta: 2024}
+            rango: {min: 1000, max: 1000000}
+            sentido: neutro
+            descripcion: Numerador de gasto_pensiones_pib. Incluye pensiones contributivas, no contributivas y de clases pasivas.
+
+    # El INE publica cada celda (edad simple y sexo) redondeada: en 1971-2012 la suma hombres + mujeres difiere
+    # del total en ±1 persona por edad (máximo observado: 12 personas en un año). Misma tolerancia que
+    # silver.validation.age_total_tolerances para la tabla 56934.
+    tolerancia_suma_sexos_personas: 16
+
+    # Control de consistencia entre fuentes: población INE vs Eurostat (demo_pjan).
+    consistencia_poblacion:
+        max_diferencia_relativa: 0.005
+
+    outliers:
+        max_modified_zscore: 3.5
+        min_points: 8
+
+# ════════════════════════════════════════════════════════════════════════════
+# ORO · 3) CAPA DE ESCENARIOS (data/gold/escenarios) · separada del ETL y de los indicadores
+# Solo integra escenarios OFICIALES publicados (Proyecciones de Población del INE 2026-2076).
+# No se modela ni se proyecta ninguna variable laboral, fiscal o macroeconómica.
+# ════════════════════════════════════════════════════════════════════════════
+escenarios:
+    output_path: data/gold/escenarios
+    manifests_path: data/gold/escenarios/manifests
+    float_epsilon: 0.000001
+    tolerancia_suma_sexos_personas: 16
+    projected_tables: ['36643', '36652']
+    indicators:
+        - poblacion
+        - indice_envejecimiento
+        - tasa_dependencia
+        - tasa_dependencia_mayores
+        - porcentaje_mayores_65
+    mart:
+        start_year: 2030
+        end_year: 2050
+        escenario_kr:
+            - base
+            - optimista
+            - pesimista
+
+# ════════════════════════════════════════════════════════════════════════════
+# CARGA (data/serving): base de datos relacional y ficheros para Power BI
+# ════════════════════════════════════════════════════════════════════════════
+carga:
+    output_path: data/serving
+    manifests_path: data/serving/manifests
+    sqlite_file: pensiones_espana.sqlite
+    csv_dir: csv
+    postgresql_dir: postgresql
+    postgresql_schema: pensiones
+
+# ════════════════════════════════════════════════════════════════════════════
+# PROGRAMACIÓN (python programar.py · librería schedule)
+# ════════════════════════════════════════════════════════════════════════════
+programacion:
+    # diaria | semanal | cada_minutos | cada_segundos (las dos últimas, para pruebas y demostraciones)
+    frecuencia: semanal
+    dia: lunes           # solo para la frecuencia semanal
+    hora: '06:00'        # hora local del equipo (diaria y semanal)
+    intervalo: 60        # minutos o segundos (cada_minutos / cada_segundos)
+    desde: bronce        # etapas que ejecuta cada trabajo
+    hasta: carga
+    registro: logs/programacion.jsonl
+

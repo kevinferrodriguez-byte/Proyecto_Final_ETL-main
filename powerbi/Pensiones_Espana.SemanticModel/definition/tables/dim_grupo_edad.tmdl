@@ -1,0 +1,55 @@
+table dim_grupo_edad
+	lineageTag: 7990c328-d1e1-53a9-b963-c74b72450f93
+
+	column grupo_edad_key
+		dataType: int64
+		lineageTag: 63c98d9d-1e41-5706-b262-bddc80a8849d
+		summarizeBy: none
+		sourceColumn: grupo_edad_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_grupo
+		dataType: string
+		lineageTag: 66ab9b9f-ea4b-5d77-9511-3b359b3a2115
+		summarizeBy: none
+		sourceColumn: codigo_grupo
+
+		annotation SummarizationSetBy = Automatic
+
+	column edad_min
+		dataType: int64
+		lineageTag: 70388af1-fc2d-57ab-9292-a33501b3682c
+		summarizeBy: none
+		sourceColumn: edad_min
+
+		annotation SummarizationSetBy = Automatic
+
+	column edad_max
+		dataType: int64
+		lineageTag: a37dfecf-df23-5e22-b075-2fcd2216443b
+		summarizeBy: none
+		sourceColumn: edad_max
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: 69c06a0d-558d-5fb2-827a-49600486d1b7
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_grupo_edad = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_grupo_edad.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"grupo_edad_key", Int64.Type}, {"codigo_grupo", type text}, {"edad_min", Int64.Type}, {"edad_max", Int64.Type}, {"descripcion", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

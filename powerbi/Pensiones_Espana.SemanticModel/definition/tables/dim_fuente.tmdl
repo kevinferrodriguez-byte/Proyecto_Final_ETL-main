@@ -1,0 +1,63 @@
+table dim_fuente
+	lineageTag: 2bd3307b-45eb-5f33-9fcb-a4686c6204d6
+
+	column fuente_key
+		dataType: int64
+		lineageTag: 2482d001-2417-5234-b08a-82e4af170c12
+		summarizeBy: none
+		sourceColumn: fuente_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_fuente
+		dataType: string
+		lineageTag: ff9eaaa4-ee2b-588a-b7c5-d531713b900b
+		summarizeBy: none
+		sourceColumn: codigo_fuente
+
+		annotation SummarizationSetBy = Automatic
+
+	column organismo
+		dataType: string
+		lineageTag: 54d6b9e9-f5d4-5149-97dd-43f593722f89
+		summarizeBy: none
+		sourceColumn: organismo
+
+		annotation SummarizationSetBy = Automatic
+
+	column acceso
+		dataType: string
+		lineageTag: ec3bba97-3cc4-5049-ad37-30c868b12ce2
+		summarizeBy: none
+		sourceColumn: acceso
+
+		annotation SummarizationSetBy = Automatic
+
+	column url
+		dataType: string
+		lineageTag: 3579d92d-3ab9-5927-8a13-3e0ca6bfa7ee
+		summarizeBy: none
+		sourceColumn: url
+
+		annotation SummarizationSetBy = Automatic
+
+	column conjuntos
+		dataType: string
+		lineageTag: 9e91d8dd-7fd6-5e3c-b35e-d85159afc31c
+		summarizeBy: none
+		sourceColumn: conjuntos
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_fuente = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_fuente.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"fuente_key", Int64.Type}, {"codigo_fuente", type text}, {"organismo", type text}, {"acceso", type text}, {"url", type text}, {"conjuntos", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

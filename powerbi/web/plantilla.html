@@ -1,0 +1,707 @@
+<title>Pensiones en España</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Réplica web del informe Power BI: barra lateral azul marino + lienzo gris claro con tarjetas blancas (sistema visual de docs/13 §7) */
+:root {
+  --bg: #F4F5F7; --surface: #FFFFFF; --border: #E1E4E8; --grid: #EEF0F3;
+  --text: #1F2328; --text2: #57606A; --muted: #8C959F;
+  --navy: #0B2A4A; --navy-text: #C9D6E6; --navy-hover: #16406B; --navy-strong: #FFFFFF;
+  --brand: #1C4E80; --observed: #2A78D6; --compare: #EB6834; --third: #1BAF7A; --reference: #8C959F;
+  --good: #1A7F37; --bad: #CF222E; --warning: #9A6700;
+  --warn-bg: #FFF8E6; --warn-border: #F2DFAE; --insight-bg: #EEF4FB; --insight-border: #D6E4F5; --icon-bg: #EAF1FB;
+  --tooltip-bg: #1F2328; --tooltip-text: #FFFFFF;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1319; --surface: #161C24; --border: #29313C; --grid: #1F262F;
+    --text: #E6EAF0; --text2: #A6B0BC; --muted: #7D8794;
+    --navy: #091D33; --navy-text: #B7C6D8; --navy-hover: #143457; --navy-strong: #FFFFFF;
+    --brand: #8DB8EE; --observed: #5B9BEA; --compare: #F08A5D; --third: #3CC891; --reference: #7D8794;
+    --good: #3FB950; --bad: #F85149; --warning: #D7A22A;
+    --warn-bg: #2A2312; --warn-border: #5A4920; --insight-bg: #14233A; --insight-border: #22385A; --icon-bg: #1A2C45;
+    --tooltip-bg: #E6EAF0; --tooltip-text: #0E1319;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1319; --surface: #161C24; --border: #29313C; --grid: #1F262F;
+  --text: #E6EAF0; --text2: #A6B0BC; --muted: #7D8794;
+  --navy: #091D33; --navy-text: #B7C6D8; --navy-hover: #143457; --navy-strong: #FFFFFF;
+  --brand: #8DB8EE; --observed: #5B9BEA; --compare: #F08A5D; --third: #3CC891; --reference: #7D8794;
+  --good: #3FB950; --bad: #F85149; --warning: #D7A22A;
+  --warn-bg: #2A2312; --warn-border: #5A4920; --insight-bg: #14233A; --insight-border: #22385A; --icon-bg: #1A2C45;
+  --tooltip-bg: #E6EAF0; --tooltip-text: #0E1319;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.45; }
+h1, h2, h3, p { margin: 0; }
+button, select { font: inherit; }
+:focus-visible { outline: 2px solid var(--observed); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+.side { background: var(--navy); color: var(--navy-text); padding: 28px 18px; display: flex; flex-direction: column; gap: 28px;
+        position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto; }
+.brand h2 { color: var(--navy-strong); font-size: 20px; font-weight: 600; line-height: 1.25; text-wrap: balance; }
+.brand p { margin-top: 8px; font-size: 13px; }
+.nav { display: flex; flex-direction: column; gap: 8px; }
+.nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px;
+              border: 1px solid rgba(255,255,255,.14); background: transparent; color: var(--navy-strong); cursor: pointer; font-size: 14px; }
+.nav button:hover { background: var(--navy-hover); }
+.nav button[aria-current="page"] { background: #2A78D6; border-color: #2A78D6; font-weight: 600; }
+.nav .ico { width: 18px; text-align: center; opacity: .9; }
+.side-foot { margin-top: auto; font-size: 12px; display: flex; flex-direction: column; gap: 10px; }
+.side-foot b { color: var(--navy-strong); }
+
+.main { min-width: 0; padding-inline: 28px; padding-block: 24px 32px; display: flex; flex-direction: column; gap: 18px; }
+.head { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; }
+.head-title { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.head-title h1 { font-size: 30px; font-weight: 700; color: var(--brand); letter-spacing: -.01em; text-wrap: balance; }
+.head-title p { color: var(--text2); font-size: 15px; }
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.periodo { display: flex; flex-direction: column; gap: 8px; min-width: 240px; }
+.periodo .lbl, .eyebrow { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: .04em; text-transform: uppercase; }
+.periodo .row { display: flex; gap: 8px; align-items: center; }
+.periodo select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); }
+.hasta { display: flex; align-items: center; gap: 14px; }
+.hasta .n { font-size: 24px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
+.ico-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--icon-bg); color: var(--observed); display: grid; place-items: center; font-size: 18px; flex: none; }
+
+.g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.g-esc { display: grid; grid-template-columns: 240px minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; }
+.g-wide { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+.g-res { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 16px; }
+td.nw { white-space: nowrap; }
+.stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.kpi { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.kpi-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.kpi .lbl { font-size: 13px; font-weight: 600; color: var(--text); }
+.kpi .val { font-size: 30px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.kpi .delta { font-size: 13px; font-weight: 600; }
+.kpi .sub { font-size: 12px; color: var(--text2); }
+.up-bad, .down-bad { color: var(--bad); } .up-good, .down-good { color: var(--good); } .flat { color: var(--text2); }
+.spark { width: 100%; height: 30px; display: block; }
+
+.panel { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.panel h3 { font-size: 16px; font-weight: 600; line-height: 1.3; color: var(--text); text-wrap: balance; }
+.panel .sub { font-size: 12.5px; color: var(--text2); }
+.chart { position: relative; height: 270px; margin-top: 6px; }
+.chart.tall { height: 380px; }
+.chart.short { height: 220px; }
+
+.banner { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 12px; padding: 12px 16px; font-size: 13.5px; }
+.banner b { color: var(--warning); }
+.insights { background: var(--insight-bg); border: 1px solid var(--insight-border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.insights-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.insights-head h3 { font-size: 16px; color: var(--brand); }
+.insights-head span { font-size: 12.5px; color: var(--text2); }
+.ins { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; border-left: 4px solid var(--observed); font-size: 14px; min-width: 0; }
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 600; color: var(--text2); background: var(--bg); padding: 8px 10px; white-space: nowrap; }
+td { padding: 8px 10px; border-top: 1px solid var(--border); vertical-align: top; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid currentColor; }
+td svg { display: block; }
+
+.radio { display: flex; flex-direction: column; gap: 8px; }
+.radio label { display: flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; }
+.lectura { font-size: 13px; color: var(--text2); }
+.lectura b { color: var(--text); }
+ul.lim { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+details summary { cursor: pointer; color: var(--observed); font-weight: 600; }
+details p { margin-top: 6px; font-size: 12.5px; color: var(--text2); word-break: break-word; }
+
+.hallazgos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.hz { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.hz .tag { align-self: flex-start; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--icon-bg); color: var(--brand); }
+.hz p { font-size: 16px; font-weight: 500; line-height: 1.4; text-wrap: pretty; }
+.hz button { align-self: flex-start; background: none; border: 0; padding: 0; color: var(--observed); font-weight: 600; cursor: pointer; }
+.hz button:hover { text-decoration: underline; }
+
+.foot { font-size: 12px; color: var(--text2); border-top: 1px solid var(--border); padding-top: 12px; }
+
+@media (max-width: 1180px) {
+  .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g-res { grid-template-columns: minmax(0, 1fr); }
+  .g-esc { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .g-esc > :first-child { grid-column: span 2; }
+}
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; height: auto; padding: 18px 16px; gap: 14px; }
+  .brand p, .side-foot { display: none; }
+  .nav { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+  .nav button { width: auto; white-space: nowrap; flex: none; }
+  .main { padding-inline: 16px; }
+  .g2, .g3, .g-wide, .hallazgos, .g-esc { grid-template-columns: minmax(0, 1fr); }
+  .g-esc > :first-child { grid-column: auto; }
+}
+@media (max-width: 480px) { .g4 { grid-template-columns: minmax(0, 1fr); } .head-title h1 { font-size: 24px; } }
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <h2>Pensiones en España</h2>
+      <p>Riesgo demográfico y sostenibilidad del sistema público</p>
+    </div>
+    <nav class="nav" id="nav" aria-label="Secciones del tablero"></nav>
+    <div class="side-foot">
+      <div><b>Fuentes oficiales</b><br>INE · Seguridad Social (TGSS/INSS) · Eurostat</div>
+      <div>Proyecto ETL · Grupo 5<br>Universidad Autónoma de Occidente</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="head">
+      <div class="head-title"><h1 id="titulo"></h1><p id="pregunta"></p></div>
+      <div class="box periodo" id="periodo">
+        <span class="lbl">Periodo observado</span>
+        <div class="row">
+          <label for="desde" class="sub">Desde</label><select id="desde"></select>
+          <label for="hasta" class="sub">Hasta</label><select id="hasta"></select>
+        </div>
+      </div>
+      <div class="box hasta">
+        <div><div class="sub" style="font-size:12px;color:var(--text2)">Datos observados hasta</div><div class="n" id="ultimo-anyo"></div></div>
+        <div class="ico-circle" aria-hidden="true">▦</div>
+      </div>
+    </header>
+    <div id="pagina" class="stack"></div>
+    <footer class="foot" id="pie"></footer>
+  </main>
+</div>
+
+<script type="application/json" id="datos">__DATOS__</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+(() => {
+"use strict";
+const D = JSON.parse(document.getElementById("datos").textContent);
+const P = D.panel, YEARS = P.anyo, PRIMERO = YEARS[0], ULTIMO = YEARS[YEARS.length - 1];
+const PROV = D.provisional || {};
+const REDUCIR = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ── Formato numérico (es-ES) ──────────────────────────────────────────────
+const cacheNF = {};
+const nf = d => cacheNF[d] || (cacheNF[d] = new Intl.NumberFormat("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" }));
+const fmt = (v, d = 1) => (v == null || Number.isNaN(v)) ? "—" : nf(d).format(v);
+const firmado = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), d);
+const pct = (g, d = 0) => firmado(g * 100, d) + " %";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ── Estado ────────────────────────────────────────────────────────────────
+const PAGINAS = [
+  { id: "resumen", nombre: "Resumen ejecutivo", ico: "⌂", titulo: "Resumen ejecutivo", pregunta: "Riesgo demográfico y sostenibilidad del sistema público de pensiones en España", periodo: false },
+  { id: "demografia", nombre: "Presión demográfica", ico: "◔", titulo: "Presión demográfica", pregunta: "¿Por qué hay cada vez más personas mayores por cada persona en edad de trabajar?", periodo: true },
+  { id: "contributivo", nombre: "Equilibrio contributivo", ico: "⇄", titulo: "Equilibrio contributivo", pregunta: "¿Crecen más los afiliados que cotizan o las pensiones que se pagan?", periodo: true },
+  { id: "financiero", nombre: "Esfuerzo financiero", ico: "€", titulo: "Esfuerzo financiero", pregunta: "¿Cuánto pesa el gasto en pensiones en la economía y cómo ha evolucionado?", periodo: true },
+  { id: "escenarios", nombre: "Horizonte 2050", ico: "↗", titulo: "Horizonte 2050", pregunta: "¿Qué rango de presión demográfica proyectan los escenarios oficiales del INE?", periodo: false },
+  { id: "metodologia", nombre: "Metodología y calidad", ico: "☰", titulo: "Metodología y calidad del dato", pregunta: "¿Cómo se calcula cada indicador y cuán fiable es el dato?", periodo: false },
+  { id: "hallazgos", nombre: "Hallazgos clave", ico: "★", titulo: "Hallazgos clave", pregunta: "¿Qué debe recordar quien lee este tablero?", periodo: false },
+];
+const S = { pagina: "resumen", desde: PRIMERO, hasta: ULTIMO, ind: "tasa_dependencia_mayores" };
+try { Object.assign(S, JSON.parse(localStorage.getItem("pensiones-estado") || "{}")); } catch (e) {}
+const hash = location.hash.replace("#", "");
+if (PAGINAS.some(p => p.id === hash)) S.pagina = hash;
+if (!PAGINAS.some(p => p.id === S.pagina)) S.pagina = "resumen";
+const guardar = () => { try { localStorage.setItem("pensiones-estado", JSON.stringify(S)); } catch (e) {} };
+
+const TODO = { desde: PRIMERO, hasta: ULTIMO };
+const rango = () => PAGINAS.find(p => p.id === S.pagina).periodo ? { desde: S.desde, hasta: S.hasta } : TODO;
+
+// ── Acceso a series ───────────────────────────────────────────────────────
+const valor = (col, y) => { const i = YEARS.indexOf(y); return i < 0 ? null : P[col][i]; };
+function serie(col, r = TODO, k = 1) {
+  const xs = [], ys = [];
+  YEARS.forEach((y, i) => { const v = P[col][i]; if (y >= r.desde && y <= r.hasta && v != null) { xs.push(y); ys.push(v * k); } });
+  return { xs, ys };
+}
+function extremos(col, r = TODO) {
+  const s = serie(col, r);
+  return { a0: s.xs[0], v0: s.ys[0], a1: s.xs[s.xs.length - 1], v1: s.ys[s.ys.length - 1], s };
+}
+const esProv = (col, y) => (PROV[col] || []).includes(y);
+function anyosCon(cols, r) {
+  return YEARS.filter(y => y >= r.desde && y <= r.hasta && cols.some(c => valor(c, y) != null));
+}
+
+// ── Títulos dinámicos (equivalentes a las medidas DAX «Título · …») ───────
+const T = {
+  dependencia(r) {
+    const e = extremos("tasa_dependencia_mayores", r); if (e.a0 == null) return "Sin datos en el periodo";
+    const x = e.v1 / e.v0;
+    const verbo = x >= 1.9 && x < 2.1 ? "prácticamente se duplicó" : x >= 2.1 ? `se multiplicó por ${fmt(x, 1)}` : x > 1 ? "aumentó" : "disminuyó";
+    return `La dependencia de mayores ${verbo}: de ${fmt(e.v0, 1)} % (${e.a0}) a ${fmt(e.v1, 1)} % (${e.a1})`;
+  },
+  estructura(r) {
+    const ys = anyosCon(["poblacion_65_mas"], r).filter(y => valor("poblacion_menores_16", y) != null);
+    if (!ys.length) return "Sin datos en el periodo";
+    const mas = y => valor("poblacion_65_mas", y) > valor("poblacion_menores_16", y);
+    let cruce = null;
+    ys.forEach((y, i) => { if (i > 0 && mas(y) && !mas(ys[i - 1])) cruce = y; });
+    if (cruce && ys.slice(ys.indexOf(cruce)).every(mas)) return `Desde ${cruce} hay más personas de 65+ que menores de 16`;
+    return ys.every(mas) ? "En todo el periodo hay más personas de 65+ que menores de 16" : "Composición de la población por grupo de edad";
+  },
+  fecundidad(r) {
+    const e = extremos("indicador_coyuntural_fecundidad", r); if (e.a1 == null) return "Sin datos en el periodo";
+    const min = Math.min(...e.s.ys);
+    return `${e.v1 <= min ? "La fecundidad marca su mínimo del periodo: " : "Fecundidad: "}${fmt(e.v1, 2)} hijos por mujer en ${e.a1}${e.v1 < 2.1 ? ", por debajo del reemplazo (2,1)" : ""}`;
+  },
+  vegetativo(r) {
+    const e = extremos("saldo_vegetativo", r); if (e.a1 == null) return "Sin datos en el periodo";
+    if (e.v1 >= 0) return `Saldo vegetativo positivo en ${e.a1}`;
+    const pos = e.s.xs.filter((y, i) => e.s.ys[i] > 0);
+    return pos.length ? `Saldo vegetativo negativo desde ${pos[pos.length - 1] + 1}: mueren más personas de las que nacen` : "Saldo vegetativo negativo en todo el periodo";
+  },
+  migratorio(r) {
+    const e = extremos("saldo_migratorio_exterior", r); if (e.a1 == null) return "Sin datos en el periodo";
+    return `Saldo migratorio con el extranjero: ${firmado(e.v1, 0)} personas en ${e.a1}`;
+  },
+  indice(r) {
+    const e = extremos("total_pensiones", r); if (e.a0 == null) return "Sin datos de pensiones en el periodo";
+    const ga = valor("total_afiliados", e.a1) / valor("total_afiliados", e.a0) - 1, gp = e.v1 / e.v0 - 1;
+    return `Desde ${e.a0}, los afiliados ${ga > gp ? "crecen más que" : "no crecen más que"} las pensiones: ${pct(ga)} frente a ${pct(gp)} (${e.a1})`;
+  },
+  ratio(r) {
+    const e = extremos("ratio_cotizantes_pensionistas", r); if (e.a0 == null) return "Sin datos en el periodo";
+    return `Afiliados por pensión: de ${fmt(e.v0, 2)} (${e.a0}) a ${fmt(e.v1, 2)} (${e.a1})`;
+  },
+  afiliacion(r) {
+    const e = extremos("tasa_afiliacion_16_64", r); if (e.a1 == null) return "Sin datos en el periodo";
+    const max = Math.max(...e.s.ys);
+    return `${fmt(e.v1, 1)} afiliados por cada 100 personas de 16-64 años en ${e.a1}${e.v1 >= max ? ": máximo del periodo" : ""}`;
+  },
+  ev65(r) {
+    const h = D.esperanza65.hombres || {}, m = D.esperanza65.mujeres || {};
+    const ys = Object.keys(m).map(Number).filter(y => h[y] != null && y >= r.desde && y <= r.hasta);
+    if (!ys.length) return "Sin datos en el periodo";
+    const y = Math.max(...ys);
+    return `A los 65 años, las mujeres viven en promedio ${fmt(m[y] - h[y], 1)} años más que los hombres (${y})`;
+  },
+  gasto(r) {
+    const e = extremos("gasto_pensiones_pib", r); if (e.a0 == null) return "Sin datos en el periodo";
+    const max = Math.max(...e.s.ys), amax = e.s.xs[e.s.ys.indexOf(max)];
+    const extra = amax !== e.a1 && amax !== e.a0 ? `; máximo de ${fmt(max, 1)} % en ${amax}` : "";
+    return `El gasto en pensiones pasó del ${fmt(e.v0, 1)} % del PIB (${e.a0}) al ${fmt(e.v1, 1)} % (${e.a1}${esProv("gasto_pensiones_pib", e.a1) ? ", provisional" : ""})${extra}`;
+  },
+  indiceFin(r) {
+    const e = extremos("gasto_pensiones_pib", r); if (e.a0 == null) return "Sin datos en el periodo";
+    const gg = valor("gasto_pensiones", e.a1) / valor("gasto_pensiones", e.a0) - 1, gpib = valor("pib", e.a1) / valor("pib", e.a0) - 1;
+    return `Desde ${e.a0}, el gasto en pensiones creció ${pct(gg)} y el PIB ${pct(gpib)} (${e.a1})`;
+  },
+  dispersion(r) {
+    const ys = anyosCon(["gasto_pensiones_pib"], r).filter(y => valor("tasa_dependencia_mayores", y) != null);
+    if (ys.length < 3) return "Datos insuficientes en el periodo";
+    const c = pearson(ys.map(y => valor("tasa_dependencia_mayores", y)), ys.map(y => valor("gasto_pensiones_pib", y)));
+    return `${c > 0.5 ? "Más dependencia de mayores, más gasto/PIB" : "Relación débil entre dependencia y gasto/PIB"}: r = ${fmt(c, 2)} (${ys[0]}–${ys[ys.length - 1]})`;
+  },
+  media(r) {
+    const e = extremos("pension_media_mensual", r); if (e.a0 == null) return "Sin datos en el periodo";
+    return `La pensión media subió un ${fmt((e.v1 / e.v0 - 1) * 100, 1)} % entre ${e.a0} y ${e.a1} (nominal)`;
+  },
+};
+function pearson(a, b) {
+  const n = a.length, ma = a.reduce((s, v) => s + v, 0) / n, mb = b.reduce((s, v) => s + v, 0) / n;
+  let sab = 0, saa = 0, sbb = 0;
+  for (let i = 0; i < n; i++) { sab += (a[i] - ma) * (b[i] - mb); saa += (a[i] - ma) ** 2; sbb += (b[i] - mb) ** 2; }
+  return sab / Math.sqrt(saa * sbb);
+}
+
+// ── Tarjetas KPI ──────────────────────────────────────────────────────────
+const TARJETAS = {
+  kpi01: { col: "indice_envejecimiento", lbl: "Índice de envejecimiento", d: 1, modo: "abs", sentido: "mayor", fuente: "INE", ico: "◔" },
+  kpi03: { col: "tasa_dependencia_mayores", lbl: "Dependencia de mayores (%)", d: 1, modo: "pp", sentido: "mayor", fuente: "INE", ico: "◎" },
+  kpi04: { col: "indicador_coyuntural_fecundidad", lbl: "Fecundidad (hijos por mujer)", d: 2, modo: "abs", sentido: "menor", fuente: "INE", ico: "◌" },
+  p65: { col: "porcentaje_mayores_65", lbl: "Población de 65+ (%)", d: 1, modo: "pp", sentido: "mayor", fuente: "INE", ico: "◑" },
+  kpi07: { col: "ratio_cotizantes_pensionistas", lbl: "Afiliados por pensión contributiva", d: 2, modo: "abs", sentido: "menor", fuente: "TGSS/INSS", ico: "⇄" },
+  afiliados: { col: "total_afiliados", lbl: "Afiliados a 31/12 (millones)", d: 2, k: 1e-6, modo: "pct", sentido: "menor", fuente: "TGSS", ico: "◍" },
+  pensiones: { col: "total_pensiones", lbl: "Pensiones contributivas (millones)", d: 2, k: 1e-6, modo: "pct", sentido: "neutro", fuente: "INSS", ico: "▤" },
+  afiliacion: { col: "tasa_afiliacion_16_64", lbl: "Afiliados por 100 personas de 16-64", d: 1, modo: "pp", sentido: "menor", fuente: "TGSS e INE", ico: "↗" },
+  kpi08: { col: "gasto_pensiones_pib", lbl: "Gasto en pensiones (% del PIB)", d: 1, modo: "pp", sentido: "mayor", fuente: "Eurostat", ico: "€" },
+  gasto: { col: "gasto_pensiones", lbl: "Gasto en pensiones (miles de M€)", d: 1, k: 1e-3, modo: "pct", sentido: "neutro", fuente: "Eurostat", ico: "€" },
+  media: { col: "pension_media_mensual", lbl: "Pensión media mensual (€)", d: 0, modo: "pct", sentido: "neutro", fuente: "INSS", ico: "▣" },
+  nomina: { col: "importe_nomina_pensiones", lbl: "Nómina mensual (miles de M€)", d: 2, k: 1e-6, modo: "pct", sentido: "neutro", fuente: "INSS", ico: "▥" },
+};
+function ultimo(col) {
+  for (let i = YEARS.length - 1; i >= 0; i--) if (P[col][i] != null) return { y: YEARS[i], v: P[col][i] };
+  return { y: null, v: null };
+}
+function variacion(spec) {
+  const u = ultimo(spec.col), prev = valor(spec.col, u.y - 1), k = spec.k || 1;
+  if (u.v == null || prev == null) return { u, texto: "Sin año anterior", clase: "flat", lectura: "" };
+  const d = spec.modo === "pct" ? u.v / prev - 1 : (u.v - prev) * k;
+  const texto = spec.modo === "pct" ? pct(d, 1) : spec.modo === "pp" ? firmado(d, 1) + " pp" : firmado(d, spec.d);
+  const flecha = d > 0 ? "▲" : d < 0 ? "▼" : "■";
+  let lectura = "", clase = "flat";
+  if (spec.sentido !== "neutro" && d !== 0) {
+    const malo = spec.sentido === "mayor" ? d > 0 : d < 0;
+    lectura = malo ? "desfavorable" : "favorable"; clase = malo ? "up-bad" : "up-good";
+  }
+  return { u, prev, d, texto: `${flecha} ${texto} vs ${u.y - 1}`, clase, lectura };
+}
+function sparkSVG(col, n = 15) {
+  const s = serie(col); const xs = s.xs.slice(-n), ys = s.ys.slice(-n);
+  if (ys.length < 2) return "";
+  const min = Math.min(...ys), max = Math.max(...ys), w = 100, h = 28, pad = 3;
+  const px = i => (i / (ys.length - 1)) * (w - 2 * pad) + pad, py = v => max === min ? h / 2 : h - pad - (v - min) / (max - min) * (h - 2 * pad);
+  const pts = ys.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+  const area = `${pad},${h} ${pts} ${(w - pad).toFixed(1)},${h}`;
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Tendencia ${xs[0]}–${xs[xs.length - 1]}">
+    <polygon points="${area}" fill="var(--observed)" opacity=".12"></polygon>
+    <polyline points="${pts}" fill="none" stroke="var(--observed)" stroke-width="1.6" vector-effect="non-scaling-stroke"></polyline>
+    <circle cx="${px(ys.length - 1).toFixed(1)}" cy="${py(ys[ys.length - 1]).toFixed(1)}" r="2.2" fill="var(--observed)"></circle></svg>`;
+}
+function tarjeta(clave) {
+  const sp = TARJETAS[clave], v = variacion(sp), k = sp.k || 1, prov = esProv(sp.col, v.u.y);
+  const sufijo = sp.lbl.includes("(%") ? " %" : "";
+  return `<div class="box kpi">
+    <div class="kpi-top"><span class="lbl">${esc(sp.lbl)}</span><span class="ico-circle" aria-hidden="true">${sp.ico}</span></div>
+    <div class="val">${fmt(v.u.v * k, sp.d)}${sufijo}${prov ? ' <span style="font-size:14px;color:var(--text2)">(p)</span>' : ""}</div>
+    <div class="delta ${v.clase}">${esc(v.texto)}${v.lectura ? ` · ${v.lectura}` : ""}</div>
+    <div class="sub">Dato ${v.u.y}${prov ? " provisional" : ""} · ${esc(sp.fuente)}</div>
+    ${sparkSVG(sp.col)}
+  </div>`;
+}
+
+// ── Gráficos (Chart.js) ───────────────────────────────────────────────────
+let graficos = [];
+const tk = n => getComputedStyle(document.documentElement).getPropertyValue("--" + n).trim();
+const etiquetas = {
+  id: "etiquetas",
+  afterDatasetsDraw(c, _a, o) {
+    if (!o || !o.on) return;
+    const ctx = c.ctx;
+    c.data.datasets.forEach((d, di) => c.getDatasetMeta(di).data.forEach((el, i) => {
+      const v = d.data[i]; if (v == null) return;
+      ctx.save(); ctx.fillStyle = o.color; ctx.font = `600 12px ${tk("font")}`; ctx.textBaseline = "middle";
+      ctx.textAlign = "left"; ctx.fillText(o.fmt(v), el.x + 6, el.y); ctx.restore();
+    }));
+  },
+};
+function opciones({ leyenda = true, ytick = v => fmt(v, 0), tooltip = (v) => fmt(v, 1), extra = {} } = {}) {
+  const text2 = tk("text2");
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false, animation: REDUCIR ? false : { duration: 350 },
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { display: leyenda, position: "top", align: "start", labels: { color: text2, usePointStyle: true, pointStyle: "circle", boxWidth: 8, boxHeight: 8, padding: 14 } },
+      tooltip: { backgroundColor: tk("tooltip-bg"), titleColor: tk("tooltip-text"), bodyColor: tk("tooltip-text"), padding: 10, boxPadding: 4, usePointStyle: true,
+                 callbacks: { label: c => c.parsed.y == null && c.parsed.x == null ? null : ` ${c.dataset.label}: ${tooltip(c.chart.options.indexAxis === "y" ? c.parsed.x : c.parsed.y, c)}` },
+                 filter: c => (c.chart.options.indexAxis === "y" ? c.parsed.x : c.parsed.y) != null && !c.dataset.sinTooltip },
+    },
+    scales: {
+      x: { grid: { display: false }, border: { color: tk("border") }, ticks: { color: text2, maxRotation: 0, autoSkip: true, maxTicksLimit: 9 } },
+      y: { grid: { color: tk("grid") }, border: { display: false }, ticks: { color: text2, callback: ytick, maxTicksLimit: 6 } },
+    },
+  }, extra);
+}
+function linea(label, data, color, { dash = [], ancho = 2.5, relleno = false, anyos = [], col = null, sinTooltip = false } = {}) {
+  const surface = tk("surface"), n = data.length;
+  return {
+    label, data, borderColor: color, backgroundColor: relleno ? hexA(color, .14) : color, borderWidth: ancho, borderDash: dash, fill: relleno ? "origin" : false,
+    tension: 0.2, spanGaps: false, sinTooltip,
+    pointRadius: c => (col && esProv(col, anyos[c.dataIndex])) ? 4 : (c.dataIndex === lastIdx(data) && !dash.length ? 3 : 0),
+    pointBackgroundColor: c => (col && esProv(col, anyos[c.dataIndex])) ? surface : color, pointBorderColor: color, pointBorderWidth: 2, pointHoverRadius: 4,
+  };
+}
+const apilado = (o, max) => { o.scales.y.stacked = true; if (max) o.scales.y.max = max; return o; };
+const lastIdx = data => { for (let i = data.length - 1; i >= 0; i--) if (data[i] != null) return i; return -1; };
+function hexA(hex, a) {
+  const h = hex.replace("#", ""); if (h.length !== 6) return hex;
+  return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`;
+}
+function crear(id, config) {
+  const el = document.getElementById(id); if (!el || !window.Chart) return;
+  graficos.push(new Chart(el, config));
+}
+const alinear = (anyos, col, k = 1) => anyos.map(y => { const v = valor(col, y); return v == null ? null : v * k; });
+
+// ── Componentes de página ─────────────────────────────────────────────────
+const panel = (id, titulo, sub, clase = "") => `<div class="box panel"><h3 id="t-${id}">${esc(titulo)}</h3><p class="sub">${sub}</p><div class="chart ${clase}"><canvas id="${id}" role="img" aria-label="${esc(titulo)}"></canvas></div></div>`;
+
+const KPI_FMT = { "KPI-01": [1, "abs", ""], "KPI-02": [1, "pp", " %"], "KPI-03": [1, "pp", " %"], "KPI-04": [2, "abs", ""], "KPI-05": [0, "abs", ""], "KPI-06": [0, "abs", ""], "KPI-07": [2, "abs", ""], "KPI-08": [1, "pp", " %"] };
+const NOMBRE_CORTO = { "KPI-01": "Índice de envejecimiento", "KPI-02": "Tasa de dependencia", "KPI-03": "Dependencia de mayores", "KPI-04": "Fecundidad (hijos por mujer)",
+  "KPI-05": "Saldo vegetativo", "KPI-06": "Saldo migratorio exterior", "KPI-07": "Afiliados por pensión", "KPI-08": "Gasto en pensiones / PIB" };
+function matrizKPIs() {
+  const filas = D.indicadores.filter(i => i.tipo_indicador === "kpi").sort((a, b) => a.codigo_kpi.localeCompare(b.codigo_kpi)).map(i => {
+    const [d, modo, suf] = KPI_FMT[i.codigo_kpi];
+    const sentido = i.sentido === "mayor_es_mas_riesgo" ? "mayor" : i.sentido === "menor_es_mas_riesgo" ? "menor" : "neutro";
+    const v = variacion({ col: i.codigo_indicador, d, modo, sentido });
+    const prov = esProv(i.codigo_indicador, v.u.y);
+    const chip = v.lectura ? `<span class="chip ${v.clase}">${v.lectura}</span>` : `<span class="chip flat">sin sentido de riesgo</span>`;
+    return `<tr title="${esc(i.descripcion)}"><td class="nw">${i.codigo_kpi}</td><td>${esc(NOMBRE_CORTO[i.codigo_kpi])}</td>
+      <td class="num"><b>${fmt(v.u.v, d)}${suf}</b>${prov ? " (p)" : ""}</td><td class="num">${v.u.y}</td>
+      <td class="num ${v.clase}">${esc(v.texto.replace(/ vs \d+$/, ""))}</td><td>${chip}</td><td style="width:90px">${sparkSVG(i.codigo_indicador, 12)}</td></tr>`;
+  }).join("");
+  return `<div class="box panel"><h3>Los 8 KPIs: último dato observado y variación anual</h3>
+    <p class="sub">La lectura depende del sentido de riesgo de cada indicador · pase el cursor sobre una fila para ver su definición</p>
+    <div class="tbl-wrap"><table><tr><th>KPI</th><th>Indicador</th><th style="text-align:right">Último valor</th><th style="text-align:right">Año</th><th style="text-align:right">Variación anual</th><th>Lectura</th><th>Tendencia</th></tr>${filas}</table></div></div>`;
+}
+
+// ── Páginas ───────────────────────────────────────────────────────────────
+const PAG = {};
+PAG.resumen = () => {
+  const html = `<div class="g4">${["kpi03", "kpi07", "kpi08", "media"].map(tarjeta).join("")}</div>
+    <div class="g-res">${panel("evolucion", T.dependencia(TODO), "Personas de 65+ por cada 100 de 16-64 años · INE")}${matrizKPIs()}</div>
+    <div class="insights"><div class="insights-head"><span class="ico-circle" aria-hidden="true">✦</span><h3>Hallazgos clave</h3><span>calculados con los datos observados en cada actualización</span></div>
+      <div class="g4">${[T.indice(TODO), T.gasto(TODO), T.fecundidad(TODO), T.vegetativo(TODO)].map(t => `<div class="ins">${esc(t)}</div>`).join("")}</div></div>`;
+  const dibujar = () => {
+    const s = serie("tasa_dependencia_mayores");
+    crear("evolucion", { type: "line", data: { labels: s.xs, datasets: [linea("Dependencia de mayores (%)", s.ys, tk("observed"), { relleno: true })] },
+      options: opciones({ leyenda: false, tooltip: v => fmt(v, 1) + " %", ytick: v => fmt(v, 0) + " %" }) });
+  };
+  return [html, dibujar];
+};
+PAG.demografia = () => {
+  const r = rango();
+  const html = `<div class="g4">${["kpi01", "kpi03", "kpi04", "p65"].map(tarjeta).join("")}</div>
+    <div class="g-wide">${panel("composicion", T.dependencia(r), "Personas de 0-15 y de 65+ por cada 100 de 16-64. La altura total es la tasa de dependencia (KPI-02), que baja porque cae la juvenil.")}
+      ${panel("estructura", T.estructura(r), "Composición de la población a 1 de enero por grupo de edad (%) · INE")}</div>
+    <div class="g3">${panel("fecundidad", T.fecundidad(r), "Indicador coyuntural de fecundidad publicado por el INE", "short")}
+      ${panel("vegetativo", T.vegetativo(r), "Nacimientos − defunciones (personas) · INE", "short")}
+      ${panel("migratorio", T.migratorio(r), "Ruptura de serie en 2021 (tablas INE 24309 → 69758)", "short")}</div>`;
+  const dibujar = () => {
+    const ys = anyosCon(["tasa_dependencia_mayores"], r);
+    const may = alinear(ys, "tasa_dependencia_mayores"), tot = alinear(ys, "tasa_dependencia");
+    const juv = tot.map((t, i) => t == null || may[i] == null ? null : t - may[i]);
+    crear("composicion", { type: "line", data: { labels: ys, datasets: [
+        { ...linea("Dependencia de mayores (65+)", may, tk("observed"), { ancho: 2 }), fill: "origin", backgroundColor: hexA(tk("observed"), .55), stack: "d" },
+        { ...linea("Dependencia juvenil (0-15)", juv, tk("compare"), { ancho: 2 }), fill: "-1", backgroundColor: hexA(tk("compare"), .45), stack: "d" }] },
+      options: apilado(opciones({ tooltip: v => fmt(v, 1) + " %", ytick: v => fmt(v, 0) + " %" })) });
+
+    const ye = anyosCon(["poblacion_total"], r);
+    const tot2 = ye.map(y => valor("poblacion_menores_16", y) + valor("poblacion_16_64", y) + valor("poblacion_65_mas", y));
+    const parte = col => ye.map((y, i) => valor(col, y) / tot2[i] * 100);
+    const capa = (lbl, d, color, fill) => ({ ...linea(lbl, d, color, { ancho: 1.5 }), fill, backgroundColor: hexA(color, .5), pointRadius: 0 });
+    crear("estructura", { type: "line", data: { labels: ye, datasets: [capa("65 y más", parte("poblacion_65_mas"), tk("observed"), "origin"),
+        capa("16 a 64", parte("poblacion_16_64"), tk("reference"), "-1"), capa("0 a 15", parte("poblacion_menores_16"), tk("compare"), "-1")] },
+      options: apilado(opciones({ tooltip: v => fmt(v, 1) + " %", ytick: v => fmt(v, 0) + " %" }), 100) });
+
+    const sf = serie("indicador_coyuntural_fecundidad", r);
+    crear("fecundidad", { type: "line", data: { labels: sf.xs, datasets: [linea("Fecundidad (hijos por mujer)", sf.ys, tk("observed")),
+        linea("Umbral de reemplazo (2,1)", sf.xs.map(() => 2.1), tk("reference"), { dash: [6, 4], ancho: 1.5 })] },
+      options: opciones({ tooltip: v => fmt(v, 2), ytick: v => fmt(v, 1) }) });
+
+    const barras = (id, col, colorFn, lbl) => {
+      const s = serie(col, r);
+      crear(id, { type: "bar", data: { labels: s.xs, datasets: [{ label: lbl, data: s.ys, backgroundColor: s.ys.map(colorFn), borderRadius: 2 }] },
+        options: opciones({ leyenda: false, tooltip: v => firmado(v, 0), ytick: v => fmt(v / 1000, 0) + " mil" }) });
+    };
+    barras("vegetativo", "saldo_vegetativo", v => v < 0 ? tk("compare") : tk("observed"), "Saldo vegetativo");
+    barras("migratorio", "saldo_migratorio_exterior", () => tk("observed"), "Saldo migratorio");
+  };
+  return [html, dibujar];
+};
+PAG.contributivo = () => {
+  const r = rango();
+  const html = `<div class="g4">${["kpi07", "afiliados", "pensiones", "afiliacion"].map(tarjeta).join("")}</div>
+    <div class="g2">${panel("indice", T.indice(r), "Índice: primer año con datos de pensiones = 100 · stocks de diciembre · TGSS e INSS")}
+      ${panel("ratio", T.ratio(r), "Afiliados en alta a 31/12 ÷ pensiones contributivas a 1/12 · se mide por pensión, no por pensionista")}</div>
+    <div class="g2">${panel("afiliacion", T.afiliacion(r), "Afiliados a 31/12 del año t ÷ población de 16-64 a 1/1 del año t+1 × 100 · no es una tasa de empleo")}
+      ${panel("ev65", T.ev65(r), "Años de vida restantes a los 65 · aproxima la duración media de una pensión de jubilación · INE")}</div>`;
+  const dibujar = () => {
+    const ys = anyosCon(["total_pensiones"], r);
+    if (ys.length) {
+      const a0 = ys[0], baseA = valor("total_afiliados", a0), baseP = valor("total_pensiones", a0);
+      crear("indice", { type: "line", data: { labels: ys, datasets: [
+          linea("Afiliados", alinear(ys, "total_afiliados").map(v => v == null ? null : v / baseA * 100), tk("observed")),
+          linea("Pensiones", alinear(ys, "total_pensiones").map(v => v / baseP * 100), tk("compare")),
+          linea(`Base 100 (${a0})`, ys.map(() => 100), tk("reference"), { dash: [6, 4], ancho: 1.5, sinTooltip: true })] },
+        options: opciones({ tooltip: v => fmt(v, 1), ytick: v => fmt(v, 0) }) });
+    }
+    const sr = serie("ratio_cotizantes_pensionistas", r);
+    crear("ratio", { type: "line", data: { labels: sr.xs, datasets: [linea("Afiliados por pensión", sr.ys, tk("observed"))] },
+      options: opciones({ leyenda: false, tooltip: v => fmt(v, 2), ytick: v => fmt(v, 2) }) });
+    const sa = serie("tasa_afiliacion_16_64", r);
+    crear("afiliacion", { type: "line", data: { labels: sa.xs, datasets: [linea("Afiliados por 100 personas de 16-64", sa.ys, tk("observed"), { relleno: true })] },
+      options: opciones({ leyenda: false, tooltip: v => fmt(v, 1), ytick: v => fmt(v, 0) }) });
+    const E = D.esperanza65, ye = Object.keys(E.total).map(Number).filter(y => y >= r.desde && y <= r.hasta).sort((a, b) => a - b);
+    crear("ev65", { type: "line", data: { labels: ye, datasets: [
+        linea("Ambos sexos", ye.map(y => E.total[y] ?? null), tk("text2"), { ancho: 2 }),
+        linea("Hombres", ye.map(y => E.hombres[y] ?? null), tk("observed"), { ancho: 2 }),
+        linea("Mujeres", ye.map(y => E.mujeres[y] ?? null), tk("compare"), { ancho: 2 })] },
+      options: opciones({ tooltip: v => fmt(v, 1) + " años", ytick: v => fmt(v, 0) }) });
+  };
+  return [html, dibujar];
+};
+PAG.financiero = () => {
+  const r = rango();
+  const html = `<div class="g4">${["kpi08", "gasto", "media", "nomina"].map(tarjeta).join("")}</div>
+    <div class="g2">${panel("kpi08", T.gasto(r), "Gasto en pensiones ESSPROS ÷ PIB a precios corrientes · Eurostat · los puntos huecos son datos provisionales")}
+      ${panel("indicefin", T.indiceFin(r), "Índice: primer año con gasto/PIB = 100 · euros corrientes · Eurostat")}</div>
+    <div class="g2">${panel("dispersion", T.dispersion(r), "Cada punto es un año. Asociación descriptiva, no causalidad: el gasto/PIB también depende del PIB, de la revalorización y de la pensión media.")}
+      ${panel("media", T.media(r), "Nómina de diciembre ÷ número de pensiones contributivas · sin pagas extraordinarias · INSS")}</div>`;
+  const dibujar = () => {
+    const sg = serie("gasto_pensiones_pib", r);
+    crear("kpi08", { type: "line", data: { labels: sg.xs, datasets: [linea("Gasto en pensiones (% PIB)", sg.ys, tk("observed"), { relleno: true, anyos: sg.xs, col: "gasto_pensiones_pib" })] },
+      options: opciones({ leyenda: false, tooltip: (v, c) => fmt(v, 2) + " %" + (esProv("gasto_pensiones_pib", c.label * 1) ? " (provisional)" : ""), ytick: v => fmt(v, 0) + " %" }) });
+    const ys = anyosCon(["gasto_pensiones_pib"], r);
+    if (ys.length) {
+      const a0 = ys[0], bg = valor("gasto_pensiones", a0), bp = valor("pib", a0);
+      crear("indicefin", { type: "line", data: { labels: ys, datasets: [
+          linea("Gasto en pensiones", alinear(ys, "gasto_pensiones").map(v => v / bg * 100), tk("observed")),
+          linea("PIB", alinear(ys, "pib").map(v => v / bp * 100), tk("compare"), { anyos: ys, col: "pib" }),
+          linea(`Base 100 (${a0})`, ys.map(() => 100), tk("reference"), { dash: [6, 4], ancho: 1.5, sinTooltip: true })] },
+        options: opciones({ tooltip: v => fmt(v, 1), ytick: v => fmt(v, 0) }) });
+      const pts = ys.filter(y => valor("tasa_dependencia_mayores", y) != null).map(y => ({ x: valor("tasa_dependencia_mayores", y), y: valor("gasto_pensiones_pib", y), anyo: y }));
+      crear("dispersion", { type: "scatter", data: { datasets: [{ label: "Años", data: pts, backgroundColor: hexA(tk("observed"), .75), borderColor: tk("observed"), pointRadius: 4, pointHoverRadius: 6 }] },
+        options: opciones({ leyenda: false, extra: {
+          interaction: { mode: "nearest", intersect: true },
+          plugins: { legend: { display: false }, tooltip: { backgroundColor: tk("tooltip-bg"), titleColor: tk("tooltip-text"), bodyColor: tk("tooltip-text"), padding: 10,
+            callbacks: { title: c => String(c[0].raw.anyo), label: c => ` Dependencia ${fmt(c.raw.x, 1)} % · gasto ${fmt(c.raw.y, 1)} % del PIB` } } },
+          scales: { x: { type: "linear", title: { display: true, text: "Dependencia de mayores (%)", color: tk("text2") }, grid: { color: tk("grid") }, border: { color: tk("border") }, ticks: { color: tk("text2"), callback: v => fmt(v, 0) } },
+                    y: { title: { display: true, text: "Gasto en pensiones (% PIB)", color: tk("text2") }, grid: { color: tk("grid") }, border: { display: false }, ticks: { color: tk("text2"), callback: v => fmt(v, 0) } } } } }) });
+    }
+    const sm = serie("pension_media_mensual", r);
+    crear("media", { type: "line", data: { labels: sm.xs, datasets: [linea("Pensión media (€/mes)", sm.ys, tk("observed"))] },
+      options: opciones({ leyenda: false, tooltip: v => fmt(v, 2) + " €", ytick: v => fmt(v, 0) + " €" }) });
+  };
+  return [html, dibujar];
+};
+
+const IND_ESC = { tasa_dependencia_mayores: ["Dependencia de mayores (%)", 1, " %"], indice_envejecimiento: ["Índice de envejecimiento", 1, ""],
+  porcentaje_mayores_65: ["% población 65+", 1, " %"], tasa_dependencia: ["Tasa de dependencia total (%)", 1, " %"] };
+const ROL = { base: "base", optimista: "optimista", pesimista: "pesimista" };
+PAG.escenarios = () => {
+  if (!IND_ESC[S.ind]) S.ind = "tasa_dependencia_mayores";
+  const [nombre, d, suf] = IND_ESC[S.ind];
+  const pr = D.proyecciones[S.ind], i50 = pr.central.anyos.indexOf(2050);
+  const v2050 = D.escenarios.map(e => ({ e, v: pr[e.codigo_escenario].valores[i50] })).sort((a, b) => b.v - a.v);
+  const min = v2050[v2050.length - 1].v, max = v2050[0].v, u = ultimo(S.ind);
+  const titulo = `${nombre}: en 2050, entre ${fmt(min, d)} y ${fmt(max, d)} en los 8 escenarios oficiales del INE`;
+  const radios = Object.entries(IND_ESC).map(([k, [n]]) => `<label><input type="radio" name="ind" id="ind-${k}" value="${k}" ${k === S.ind ? "checked" : ""}> ${esc(n)}</label>`).join("");
+  const html = `<div class="banner"><b>ⓘ Escenarios demográficos condicionales del INE (2026-2076).</b> No son previsiones ni escenarios fiscales: no se proyectan empleo, cotizaciones, PIB ni gasto. Línea continua: observado · discontinua: base · punteadas: optimista y pesimista.</div>
+    <div class="g-esc">
+      <div class="stack">
+        <div class="box"><h3 style="font-size:16px;margin-bottom:10px">Indicador</h3><div class="radio" id="selector">${radios}</div></div>
+        <div class="box kpi"><span class="lbl">Último dato observado</span><div class="val">${fmt(u.v, d)}${suf}</div><div class="sub">${esc(nombre)} · ${u.y} · INE</div></div>
+        <div class="box lectura"><b>Lectura:</b> la distancia entre las líneas punteadas es el rango que el INE asocia a distintas hipótesis de fecundidad y migración. No es un intervalo de probabilidad.</div>
+      </div>
+      ${panel("proyeccion", titulo, "Observado 2000-2025 y Proyecciones de Población INE 2026-2076", "tall")}
+      ${panel("barras2050", "Valor en 2050 en los 8 escenarios del INE", "Incluye los 5 escenarios de sensibilidad · entre paréntesis, el papel del escenario en el KR 3.1", "tall")}
+    </div>`;
+  const dibujar = () => {
+    document.querySelectorAll('#selector input').forEach(el => el.addEventListener("change", () => { S.ind = el.value; guardar(); render(); }));
+    const obs = YEARS.filter(y => y >= 2000 && valor(S.ind, y) != null);
+    const fut = pr.central.anyos, etiquetasX = [...obs, ...fut];
+    const ultimoObs = valor(S.ind, obs[obs.length - 1]);
+    const conecta = codigo => [...obs.slice(0, -1).map(() => null), ultimoObs, ...pr[codigo].valores];
+    const codigoRol = rol => D.escenarios.find(e => e.escenario_kr === rol).codigo_escenario;
+    crear("proyeccion", { type: "line", data: { labels: etiquetasX, datasets: [
+        linea("Observado", [...obs.map(y => valor(S.ind, y)), ...fut.map(() => null)], tk("observed"), { ancho: 3 }),
+        linea("Escenario base", conecta(codigoRol("base")), tk("observed"), { dash: [8, 5], ancho: 2 }),
+        linea("Escenario optimista", conecta(codigoRol("optimista")), tk("third"), { dash: [2, 3], ancho: 2 }),
+        linea("Escenario pesimista", conecta(codigoRol("pesimista")), tk("compare"), { dash: [2, 3], ancho: 2 })] },
+      options: opciones({ tooltip: v => fmt(v, d) + suf, ytick: v => fmt(v, 0) }) });
+    const lbl = x => x.e.etiqueta_ine + (ROL[x.e.escenario_kr] ? ` (${ROL[x.e.escenario_kr]})` : "");
+    crear("barras2050", { type: "bar", data: { labels: v2050.map(lbl), datasets: [{ label: "Valor en 2050", data: v2050.map(x => x.v),
+        backgroundColor: v2050.map(x => x.e.escenario_kr === "base" ? tk("brand") : hexA(tk("observed"), .8)), borderRadius: 3, barPercentage: .75 }] },
+      options: opciones({ leyenda: false, tooltip: v => fmt(v, d) + suf, extra: { indexAxis: "y",
+        plugins: { legend: { display: false }, etiquetas: { on: true, color: tk("text"), fmt: v => fmt(v, d) },
+                   tooltip: { backgroundColor: tk("tooltip-bg"), titleColor: tk("tooltip-text"), bodyColor: tk("tooltip-text"), callbacks: { label: c => ` Valor en 2050: ${fmt(c.parsed.x, d)}${suf}` } } },
+        layout: { padding: { right: 44 } },
+        scales: { x: { beginAtZero: true, grid: { color: tk("grid") }, border: { display: false }, ticks: { color: tk("text2"), maxTicksLimit: 5 } },
+                  y: { grid: { display: false }, border: { color: tk("border") }, ticks: { color: tk("text2"), autoSkip: false } } } } }) });
+  };
+  return [html, dibujar];
+};
+
+const UNIDAD = { porcentaje: "%", hijos_por_mujer: "hijos por mujer", personas: "personas", afiliados_por_pension: "afiliados por pensión", porcentaje_pib: "% del PIB", anos: "años", eur_mes: "€/mes" };
+const FUENTE = { ine: "INE", seguridad_social: "Seguridad Social", eurostat: "Eurostat" };
+PAG.metodologia = () => {
+  const R = D.reglas, cuenta = res => R.filter(x => x.resultado === res).length;
+  const tarjetaQ = (lbl, n, ico, color) => `<div class="box kpi"><div class="kpi-top"><span class="lbl">${lbl}</span><span class="ico-circle" style="color:${color}" aria-hidden="true">${ico}</span></div><div class="val" style="color:${color}">${n}</div></div>`;
+  const avisos = R.filter(x => x.resultado !== "cumple").map(x => `<tr><td>${esc(x.capa)}</td><td>${esc(x.regla)}</td><td><span class="chip" style="color:var(--${x.resultado === "falla" ? "bad" : "warning"})">${esc(x.resultado)}</span></td>
+      <td><details><summary>${esc((x.detalle || "").slice(0, 70))}${(x.detalle || "").length > 70 ? "…" : ""}</summary><p>${esc(x.detalle)}</p></details></td></tr>`).join("") || `<tr><td colspan="4">Sin advertencias ni fallas.</td></tr>`;
+  const dicc = D.indicadores.filter(i => i.tipo_indicador !== "metrica_base").sort((a, b) => (a.codigo_kpi || "Z").localeCompare(b.codigo_kpi || "Z")).map(i =>
+    `<tr><td>${i.codigo_kpi || "Contexto"}</td><td>${esc(i.nombre_indicador)}</td><td>${esc(i.formula)}</td><td>${esc(UNIDAD[i.unidad] || "personas")}</td><td>${esc(FUENTE[i.codigo_fuente] || i.codigo_fuente)}</td><td class="num">${i.cobertura_desde ?? ""}–${i.cobertura_hasta ?? ""}</td></tr>`).join("");
+  const html = `<div class="g4">${tarjetaQ("Reglas de calidad evaluadas", R.length, "▦", "var(--brand)")}${tarjetaQ("Reglas superadas", cuenta("cumple"), "✓", "var(--good)")}
+      ${tarjetaQ("Advertencias", cuenta("advertencia"), "!", "var(--warning)")}${tarjetaQ("Fallas", cuenta("falla"), "✕", "var(--bad)")}</div>
+    <div class="g-wide">${panel("capas", `${cuenta("cumple")} de ${R.length} reglas superadas; ${cuenta("falla")} fallas en la última ejecución`, "Última ejecución de cada capa del pipeline · una falla impide escribir la capa")}
+      <div class="box panel"><h3>Advertencias y fallas activas</h3><p class="sub">Las advertencias no detienen el pipeline: señalan atípicos reales o diferencias entre fuentes para revisión humana</p>
+        <div class="tbl-wrap"><table><tr><th>Capa</th><th>Regla</th><th>Resultado</th><th>Detalle</th></tr>${avisos}</table></div></div></div>
+    <div class="g-wide"><div class="box panel"><h3>Diccionario de indicadores</h3><p class="sub">Fórmula, unidad, fuente y cobertura de los 8 KPIs y los indicadores de contexto</p>
+        <div class="tbl-wrap"><table><tr><th>KPI</th><th>Indicador</th><th>Fórmula</th><th>Unidad</th><th>Fuente</th><th style="text-align:right">Cobertura</th></tr>${dicc}</table></div></div>
+      <div class="box panel"><h3>Limitaciones</h3><ul class="lim">
+        <li>KPI-07 se mide por pensión, no por pensionista; pensiones disponibles desde 2016.</li>
+        <li>Ruptura del saldo migratorio en 2021.</li><li>PIB y gasto/PIB recientes son provisionales y revisables.</li>
+        <li>Solo España: sin datos por comunidad autónoma.</li><li>Los escenarios del INE son demográficos, no fiscales.</li>
+        <li>Las relaciones mostradas son descriptivas, no causales.</li></ul></div></div>`;
+  const dibujar = () => {
+    const capas = [...new Set(R.map(x => x.capa))];
+    const serieRes = (res, color) => ({ label: res, data: capas.map(c => { const t = R.filter(x => x.capa === c); return t.filter(x => x.resultado === res).length / t.length * 100; }),
+      backgroundColor: color, borderColor: tk("surface"), borderWidth: 1, stack: "q" });
+    crear("capas", { type: "bar", data: { labels: capas, datasets: [serieRes("cumple", tk("good")), serieRes("advertencia", tk("warning")), serieRes("falla", tk("bad"))] },
+      options: opciones({ tooltip: v => fmt(v, 0) + " %", extra: { indexAxis: "y",
+        scales: { x: { stacked: true, max: 100, grid: { color: tk("grid") }, border: { display: false }, ticks: { color: tk("text2"), callback: v => v + " %" } },
+                  y: { stacked: true, grid: { display: false }, border: { color: tk("border") }, ticks: { color: tk("text2"), autoSkip: false } } } } }) });
+  };
+  return [html, dibujar];
+};
+PAG.hallazgos = () => {
+  const pr = D.proyecciones.tasa_dependencia_mayores, i50 = pr.central.anyos.indexOf(2050), v = Object.values(pr).map(x => x.valores[i50]);
+  const R = D.reglas, ok = R.filter(x => x.resultado === "cumple").length, adv = R.filter(x => x.resultado === "advertencia").length, fal = R.filter(x => x.resultado === "falla").length;
+  const items = [
+    ["Presión demográfica", T.dependencia(TODO), "demografia"],
+    ["Presión demográfica", T.estructura(TODO), "demografia"],
+    ["Presión demográfica", T.fecundidad(TODO), "demografia"],
+    ["Presión demográfica", `${T.vegetativo(TODO)}. ${T.migratorio(TODO)}`, "demografia"],
+    ["Equilibrio contributivo", T.indice(TODO), "contributivo"],
+    ["Equilibrio contributivo", T.ev65(TODO), "contributivo"],
+    ["Esfuerzo financiero", T.gasto(TODO), "financiero"],
+    ["Esfuerzo financiero", T.indiceFin(TODO), "financiero"],
+    ["Horizonte 2050", `En 2050 la dependencia de mayores estará entre ${fmt(Math.min(...v), 1)} % y ${fmt(Math.max(...v), 1)} % en los 8 escenarios del INE, frente a ${fmt(ultimo("tasa_dependencia_mayores").v, 1)} % hoy`, "escenarios"],
+    ["Calidad del dato", `${R.length} reglas de calidad evaluadas: ${ok} superadas, ${adv} advertencias y ${fal} fallas en la última ejecución`, "metodologia"],
+  ];
+  const html = `<div class="hallazgos">${items.map(([tag, txt, pag]) => `<div class="box hz"><span class="tag">${esc(tag)}</span><p>${esc(txt)}</p>
+      <button type="button" data-ir="${pag}">Ver en ${esc(PAGINAS.find(p => p.id === pag).nombre)} →</button></div>`).join("")}</div>`;
+  const dibujar = () => document.querySelectorAll("[data-ir]").forEach(b => b.addEventListener("click", () => ir(b.dataset.ir)));
+  return [html, dibujar];
+};
+
+// ── Navegación y render ───────────────────────────────────────────────────
+const nav = document.getElementById("nav");
+nav.innerHTML = PAGINAS.map(p => `<button type="button" id="nav-${p.id}" data-p="${p.id}"><span class="ico" aria-hidden="true">${p.ico}</span>${esc(p.nombre)}</button>`).join("");
+nav.addEventListener("click", e => { const b = e.target.closest("button"); if (b) ir(b.dataset.p); });
+function ir(id) { S.pagina = id; guardar(); try { history.replaceState(null, "", "#" + id); } catch (e) {} render(); window.scrollTo({ top: 0, behavior: REDUCIR ? "auto" : "smooth" }); }
+
+const selDesde = document.getElementById("desde"), selHasta = document.getElementById("hasta");
+const opcionesAnyo = YEARS.map(y => `<option value="${y}">${y}</option>`).join("");
+selDesde.innerHTML = opcionesAnyo; selHasta.innerHTML = opcionesAnyo;
+function cambioPeriodo() {
+  let a = +selDesde.value, b = +selHasta.value; if (a > b) [a, b] = [b, a];
+  S.desde = a; S.hasta = b; guardar(); render();
+}
+selDesde.addEventListener("change", cambioPeriodo); selHasta.addEventListener("change", cambioPeriodo);
+
+document.getElementById("ultimo-anyo").textContent = ULTIMO;
+document.getElementById("pie").textContent = `Notas: 2020 es una anomalía (COVID-19) · el saldo migratorio tiene ruptura de serie en 2021 · PIB y gasto/PIB recientes son provisionales · KPI-07 se mide por pensión, no por pensionista · los escenarios del INE son demográficos, no fiscales. Datos: capa de carga del pipeline ETL (generada ${D.generado} UTC).`;
+
+function render() {
+  graficos.forEach(g => g.destroy()); graficos = [];
+  if (window.Chart) { Chart.defaults.font.family = tk("font"); Chart.defaults.color = tk("text2"); }
+  const p = PAGINAS.find(x => x.id === S.pagina);
+  document.querySelectorAll("#nav button").forEach(b => b.removeAttribute("aria-current"));
+  document.getElementById(`nav-${p.id}`).setAttribute("aria-current", "page");
+  document.getElementById("titulo").textContent = p.titulo;
+  document.getElementById("pregunta").textContent = p.pregunta;
+  document.getElementById("periodo").hidden = !p.periodo;
+  selDesde.value = S.desde; selHasta.value = S.hasta;
+  const [html, dibujar] = PAG[p.id]();
+  document.getElementById("pagina").innerHTML = html;
+  dibujar();
+}
+if (window.Chart) Chart.register(etiquetas);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+window.addEventListener("hashchange", () => { const h = location.hash.replace("#", ""); if (PAGINAS.some(p => p.id === h) && h !== S.pagina) { S.pagina = h; render(); } });
+render();
+})();
+</script>

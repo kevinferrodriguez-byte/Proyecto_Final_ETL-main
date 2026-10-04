@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "098f913844b33199704c",
+  "displayName": "📓   Hallazgos claves",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "ec3c672d8996e03a84cc",
+      "target": "8ebf001d650188bc8b00",
+      "type": "NoFilter"
+    },
+    {
+      "source": "ec3c672d8996e03a84cc",
+      "target": "80df690724a5630c5638",
+      "type": "NoFilter"
+    },
+    {
+      "source": "ec3c672d8996e03a84cc",
+      "target": "2026802c615ded0619a4",
+      "type": "NoFilter"
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+table dm_panel_anual
+	lineageTag: 73a7c10c-a2e9-50dc-bcce-97f30c012799
+
+	column tiempo_key
+		dataType: int64
+		isHidden
+		lineageTag: 81ba4748-d4f4-57cf-897f-e8a16bbdb4aa
+		summarizeBy: none
+		sourceColumn: tiempo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column anyo
+		dataType: int64
+		lineageTag: b3cc19e5-45f2-55b8-8405-1f13eede0aad
+		summarizeBy: none
+		sourceColumn: anyo
+
+		annotation SummarizationSetBy = Automatic
+
+	column territorio_key
+		dataType: int64
+		isHidden
+		lineageTag: bef681af-57a6-597e-94a7-61cbac510c26
+		summarizeBy: none
+		sourceColumn: territorio_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column poblacion_total
+		dataType: double
+		lineageTag: d0014ad3-bbcd-54ac-a53b-3365786f0652
+		summarizeBy: none
+		sourceColumn: poblacion_total
+
+		annotation SummarizationSetBy = Automatic
+
+	column poblacion_menores_16
+		dataType: double
+		lineageTag: de1aa225-26f6-5849-b87c-fb936ebfb4bf
+		summarizeBy: none
+		sourceColumn: poblacion_menores_16
+
+		annotation SummarizationSetBy = Automatic
+
+	column poblacion_16_64
+		dataType: double
+		lineageTag: cf9dae60-56ed-52d4-a383-66f6ec8e0f72
+		summarizeBy: none
+		sourceColumn: poblacion_16_64
+
+		annotation SummarizationSetBy = Automatic
+
+	column poblacion_65_mas
+		dataType: double
+		lineageTag: ea090b3e-38b9-59a9-8b45-036866645028
+		summarizeBy: none
+		sourceColumn: poblacion_65_mas
+
+		annotation SummarizationSetBy = Automatic
+
+	column indice_envejecimiento
+		dataType: double
+		lineageTag: 41098e24-4172-5656-9429-b37ed6f2583c
+		summarizeBy: none
+		sourceColumn: indice_envejecimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column tasa_dependencia
+		dataType: double
+		lineageTag: 860325e5-4dd7-595d-85c5-b42856b1e1e0
+		summarizeBy: none
+		sourceColumn: tasa_dependencia
+
+		annotation SummarizationSetBy = Automatic
+
+	column tasa_dependencia_mayores
+		dataType: double
+		lineageTag: 32979e5c-0773-56a3-87d6-f0de0952ee28
+		summarizeBy: none
+		sourceColumn: tasa_dependencia_mayores
+
+		annotation SummarizationSetBy = Automatic
+
+	column indicador_coyuntural_fecundidad
+		dataType: double
+		lineageTag: 7089dcf8-8678-5cee-88df-c732cda2cc64
+		summarizeBy: none
+		sourceColumn: indicador_coyuntural_fecundidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column saldo_vegetativo
+		dataType: double
+		lineageTag: c66fc6ad-64b2-5511-af6d-e2411fd442a9
+		summarizeBy: none
+		sourceColumn: saldo_vegetativo
+
+		annotation SummarizationSetBy = Automatic
+
+	column saldo_migratorio_exterior
+		dataType: double
+		lineageTag: 266dd761-18ac-5a04-994a-53f6fe18a7df
+		summarizeBy: none
+		sourceColumn: saldo_migratorio_exterior
+
+		annotation SummarizationSetBy = Automatic
+
+	column ratio_cotizantes_pensionistas
+		dataType: double
+		lineageTag: 8d0f4018-5ab9-5b35-9737-98fe6dcc0c74
+		summarizeBy: none
+		sourceColumn: ratio_cotizantes_pensionistas
+
+		annotation SummarizationSetBy = Automatic
+
+	column gasto_pensiones_pib
+		dataType: double
+		lineageTag: 97097701-2ae4-5b6a-b005-de49f18cf2ac
+		summarizeBy: none
+		sourceColumn: gasto_pensiones_pib
+
+		annotation SummarizationSetBy = Automatic
+
+	column porcentaje_mayores_65
+		dataType: double
+		lineageTag: 0cf2207c-5b61-5cd3-ad46-a189cde8a396
+		summarizeBy: none
+		sourceColumn: porcentaje_mayores_65
+
+		annotation SummarizationSetBy = Automatic
+
+	column esperanza_vida_nacimiento
+		dataType: double
+		lineageTag: 5410c6fc-2d1b-5744-bca4-ae76ec76d3d9
+		summarizeBy: none
+		sourceColumn: esperanza_vida_nacimiento
+
+		annotation SummarizationSetBy = Automatic
+
+	column esperanza_vida_65
+		dataType: double
+		lineageTag: 5fefdc11-4649-57d1-aab5-4d2c1bfe2695
+		summarizeBy: none
+		sourceColumn: esperanza_vida_65
+
+		annotation SummarizationSetBy = Automatic
+
+	column tasa_afiliacion_16_64
+		dataType: double
+		lineageTag: e796ef62-adbe-5c7f-a601-d2c5173b94fb
+		summarizeBy: none
+		sourceColumn: tasa_afiliacion_16_64
+
+		annotation SummarizationSetBy = Automatic
+
+	column pension_media_mensual
+		dataType: double
+		lineageTag: 68568283-f305-5df6-9dd3-8c43f5d490e8
+		summarizeBy: none
+		sourceColumn: pension_media_mensual
+
+		annotation SummarizationSetBy = Automatic
+
+	column nacimientos
+		dataType: double
+		lineageTag: 1aa19f2b-e2f2-5dfe-960b-f6bf759dd45c
+		summarizeBy: none
+		sourceColumn: nacimientos
+
+		annotation SummarizationSetBy = Automatic
+
+	column defunciones
+		dataType: double
+		lineageTag: 535eb93c-0136-59ee-9d23-589cd30de9d1
+		summarizeBy: none
+		sourceColumn: defunciones
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_afiliados
+		dataType: double
+		lineageTag: d7111116-2202-51ea-9b03-a065450ec9d1
+		summarizeBy: none
+		sourceColumn: total_afiliados
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_pensiones
+		dataType: double
+		lineageTag: f33cdfa2-be1e-5c05-97ab-762848e52893
+		summarizeBy: none
+		sourceColumn: total_pensiones
+
+		annotation SummarizationSetBy = Automatic
+
+	column importe_nomina_pensiones
+		dataType: double
+		lineageTag: 6519957e-fa9e-5f09-a674-339aafa1b5d2
+		summarizeBy: none
+		sourceColumn: importe_nomina_pensiones
+
+		annotation SummarizationSetBy = Automatic
+
+	column pib
+		dataType: double
+		lineageTag: be69d8f8-8f46-52aa-9287-936e79bdf83b
+		summarizeBy: none
+		sourceColumn: pib
+
+		annotation SummarizationSetBy = Automatic
+
+	column gasto_pensiones
+		dataType: double
+		lineageTag: 8f096aa6-e3dd-5e18-9b86-89d58ca824b2
+		summarizeBy: none
+		sourceColumn: gasto_pensiones
+
+		annotation SummarizationSetBy = Automatic
+
+	column tiene_datos_provisionales
+		dataType: boolean
+		lineageTag: 79c5fcf1-27c4-5bed-88d3-55a07073a391
+		summarizeBy: none
+		sourceColumn: tiene_datos_provisionales
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_run_id
+		dataType: string
+		lineageTag: 410c7a67-3998-530a-b57a-88c315fb077f
+		summarizeBy: none
+		sourceColumn: gold_run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dm_panel_anual = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dm_panel_anual.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"tiempo_key", Int64.Type}, {"anyo", Int64.Type}, {"territorio_key", Int64.Type}, {"poblacion_total", type number}, {"poblacion_menores_16", type number}, {"poblacion_16_64", type number}, {"poblacion_65_mas", type number}, {"indice_envejecimiento", type number}, {"tasa_dependencia", type number}, {"tasa_dependencia_mayores", type number}, {"indicador_coyuntural_fecundidad", type number}, {"saldo_vegetativo", type number}, {"saldo_migratorio_exterior", type number}, {"ratio_cotizantes_pensionistas", type number}, {"gasto_pensiones_pib", type number}, {"porcentaje_mayores_65", type number}, {"esperanza_vida_nacimiento", type number}, {"esperanza_vida_65", type number}, {"tasa_afiliacion_16_64", type number}, {"pension_media_mensual", type number}, {"nacimientos", type number}, {"defunciones", type number}, {"total_afiliados", type number}, {"total_pensiones", type number}, {"importe_nomina_pensiones", type number}, {"pib", type number}, {"gasto_pensiones", type number}, {"tiene_datos_provisionales", type logical}, {"gold_run_id", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

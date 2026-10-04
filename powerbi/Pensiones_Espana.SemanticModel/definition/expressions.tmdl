@@ -1,0 +1,5 @@
+expression RutaCSV = "C:\Users\kevin\OneDrive\Escritorio\Proyecto_Final_ETL-main\data\serving\csv\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 6a23aedf-394a-5eee-b26b-4f2751b6e156
+
+	annotation PBI_ResultType = Text
+

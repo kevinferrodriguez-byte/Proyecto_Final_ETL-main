@@ -1,0 +1,47 @@
+table dim_territorio
+	lineageTag: 66733d06-e2c9-5806-ba9a-b7e9059781d4
+
+	column territorio_key
+		dataType: int64
+		lineageTag: 0a96973c-f235-527b-9bc1-932a45f4092b
+		summarizeBy: none
+		sourceColumn: territorio_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_territorio
+		dataType: string
+		lineageTag: c9227401-d549-5a25-b615-ff3d33743933
+		summarizeBy: none
+		sourceColumn: codigo_territorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_territorio
+		dataType: string
+		lineageTag: 7ed2a630-c978-5aa7-a70f-96873289ceca
+		summarizeBy: none
+		sourceColumn: nombre_territorio
+
+		annotation SummarizationSetBy = Automatic
+
+	column nivel_territorial
+		dataType: string
+		lineageTag: 11eb1a8c-fb60-5224-8232-5befbe286dff
+		summarizeBy: none
+		sourceColumn: nivel_territorial
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_territorio = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_territorio.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"territorio_key", Int64.Type}, {"codigo_territorio", type text}, {"nombre_territorio", type text}, {"nivel_territorial", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

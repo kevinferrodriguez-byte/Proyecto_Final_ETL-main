@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Pensiones_Espana"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "25e9db5a-1dbf-4fde-b4aa-e77c3de333fb"
+  }
+}

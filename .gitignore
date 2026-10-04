@@ -1,0 +1,29 @@
+# Python environments
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Secrets and local environment variables
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ETL-generated data and execution logs
+data/
+logs/
+*.log
+
+# Notebook and operating-system metadata
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+# Local planning files
+TODO.md

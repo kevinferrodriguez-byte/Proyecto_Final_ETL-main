@@ -1,0 +1,38 @@
+table sel_indicador_escenario
+	lineageTag: e83c8c1a-37a5-5d90-b860-0c7163571266
+
+	column orden
+		dataType: int64
+		lineageTag: 126aea70-0e9d-5007-ba91-d1fa9fc7586d
+		summarizeBy: none
+		sourceColumn: orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo
+		dataType: string
+		lineageTag: 7c6b6858-2cfd-5280-81bb-82620d29a28e
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre
+		dataType: string
+		lineageTag: e488390a-a3f3-5727-b637-068b81167ffb
+		summarizeBy: none
+		sourceColumn: nombre
+		sortByColumn: orden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sel_indicador_escenario = m
+		mode: import
+		source =
+				let
+				    Origen = #table(type table [orden = Int64.Type, codigo = text, nombre = text], {{1, "tasa_dependencia_mayores", "Dependencia de mayores (%)"}, {2, "indice_envejecimiento", "Índice de envejecimiento"}, {3, "porcentaje_mayores_65", "% población 65+"}, {4, "tasa_dependencia", "Tasa de dependencia total (%)"}})
+				in
+				    Origen
+
+	annotation PBI_ResultType = Table
+

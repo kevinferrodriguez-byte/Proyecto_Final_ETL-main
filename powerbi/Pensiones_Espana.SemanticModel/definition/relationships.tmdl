@@ -1,0 +1,60 @@
+relationship db8ddfc8-9372-586e-a432-0acc8baa5f7d
+	fromColumn: fact_indicadores_anual.tiempo_key
+	toColumn: dim_tiempo.tiempo_key
+
+relationship 6edf0a4a-f749-5679-9da3-e1b6f920ca00
+	fromColumn: fact_indicadores_anual.territorio_key
+	toColumn: dim_territorio.territorio_key
+
+relationship 30c439d0-c131-56cd-9375-2617aa92000f
+	fromColumn: fact_indicadores_anual.sexo_key
+	toColumn: dim_sexo.sexo_key
+
+relationship 8a505566-d0df-59fc-982a-e497c8e3b037
+	fromColumn: fact_indicadores_anual.grupo_edad_key
+	toColumn: dim_grupo_edad.grupo_edad_key
+
+relationship da8b40e0-9437-5648-bdd5-d5bb2c5dfec3
+	fromColumn: fact_indicadores_anual.indicador_key
+	toColumn: dim_indicador.indicador_key
+
+relationship e1c0ebd9-1a3f-5419-ab92-38899df6e456
+	fromColumn: fact_indicadores_anual.fuente_key
+	toColumn: dim_fuente.fuente_key
+
+relationship 55170acb-5e06-595e-91df-4f011659016e
+	fromColumn: fact_proyecciones_demograficas.tiempo_key
+	toColumn: dim_tiempo.tiempo_key
+
+relationship 674445b7-3d05-5a56-be4e-94172b0b634c
+	fromColumn: fact_proyecciones_demograficas.territorio_key
+	toColumn: dim_territorio.territorio_key
+
+relationship cb88d79a-4cd7-5606-a390-f37ad99f522a
+	fromColumn: fact_proyecciones_demograficas.escenario_key
+	toColumn: dim_escenario.escenario_key
+
+relationship a60dc8b6-2f22-5f23-b84e-2738ccf4073f
+	fromColumn: fact_proyecciones_demograficas.sexo_key
+	toColumn: dim_sexo.sexo_key
+
+relationship 3d9d971f-cc9e-5d35-a28d-864cce1cc18e
+	fromColumn: fact_proyecciones_demograficas.grupo_edad_key
+	toColumn: dim_grupo_edad.grupo_edad_key
+
+relationship 401bd106-6e96-54d4-8a8e-a6467f26f174
+	fromColumn: fact_proyecciones_demograficas.indicador_key
+	toColumn: dim_indicador.indicador_key
+
+relationship 3930d215-854b-5dd3-b5a7-652d8945a4d6
+	fromColumn: fact_proyecciones_demograficas.fuente_key
+	toColumn: dim_fuente.fuente_key
+
+relationship 1b29da70-7bfc-5e02-8862-48365d03c7f5
+	fromColumn: dm_panel_anual.tiempo_key
+	toColumn: dim_tiempo.tiempo_key
+
+relationship bacdbb4b-c1fe-5169-9eb0-2dc83f62191f
+	fromColumn: dm_panel_anual.territorio_key
+	toColumn: dim_territorio.territorio_key
+

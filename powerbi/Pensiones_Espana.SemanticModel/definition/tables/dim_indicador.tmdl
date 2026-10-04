@@ -1,0 +1,184 @@
+table dim_indicador
+	lineageTag: 353b8075-5728-5b7d-90c0-2f93114f71a8
+
+	column indicador_key
+		dataType: int64
+		lineageTag: c5e491d1-be06-55c0-acf7-9d4654294957
+		summarizeBy: none
+		sourceColumn: indicador_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_indicador
+		dataType: string
+		lineageTag: cd65f495-eec6-5bb8-a004-b57f807091f6
+		summarizeBy: none
+		sourceColumn: codigo_indicador
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_indicador
+		dataType: string
+		lineageTag: da2cbf20-bcff-56de-9aac-9e4e94b06187
+		summarizeBy: none
+		sourceColumn: nombre_indicador
+		sortByColumn: indicador_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_indicador
+		dataType: string
+		lineageTag: 92e2a2dd-401e-56c4-a89d-9f9a4ab714d2
+		summarizeBy: none
+		sourceColumn: tipo_indicador
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_kpi
+		dataType: string
+		lineageTag: fd0b9cb4-b66f-540e-91b7-2881014ced16
+		summarizeBy: none
+		sourceColumn: codigo_kpi
+
+		annotation SummarizationSetBy = Automatic
+
+	column okr
+		dataType: string
+		lineageTag: 48c877c0-085f-5935-b81a-8bccfc99ff62
+		summarizeBy: none
+		sourceColumn: okr
+
+		annotation SummarizationSetBy = Automatic
+
+	column pestana_tablero
+		dataType: string
+		lineageTag: e0a00212-db89-588f-98c0-3983a58813a9
+		summarizeBy: none
+		sourceColumn: pestana_tablero
+
+		annotation SummarizationSetBy = Automatic
+
+	column dominio
+		dataType: string
+		lineageTag: d6343a45-4547-5f2f-9f81-653b100c3359
+		summarizeBy: none
+		sourceColumn: dominio
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidad
+		dataType: string
+		lineageTag: fb7b7168-f2ab-59fa-b0f7-cf0587ffc4f9
+		summarizeBy: none
+		sourceColumn: unidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column formula
+		dataType: string
+		lineageTag: 49eb5d37-d3b8-5bb1-af5a-0d6e0ed4f8ed
+		summarizeBy: none
+		sourceColumn: formula
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_fuente
+		dataType: string
+		lineageTag: 778f24f8-1f83-50b4-8fc8-7404f245292f
+		summarizeBy: none
+		sourceColumn: codigo_fuente
+
+		annotation SummarizationSetBy = Automatic
+
+	column origen
+		dataType: string
+		lineageTag: b53c0e7f-691e-53d4-8fc7-9958ad66526f
+		summarizeBy: none
+		sourceColumn: origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column periodicidad
+		dataType: string
+		lineageTag: 38fc1413-9fd7-5490-be2e-deaa37156ebe
+		summarizeBy: none
+		sourceColumn: periodicidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column referencia_temporal
+		dataType: string
+		lineageTag: 9b6bfe1c-071f-5b85-9bcb-705a4f55488e
+		summarizeBy: none
+		sourceColumn: referencia_temporal
+
+		annotation SummarizationSetBy = Automatic
+
+	column nivel_agregacion
+		dataType: string
+		lineageTag: e6f6e636-aa8f-5ce7-b1aa-2b8bc483c33e
+		summarizeBy: none
+		sourceColumn: nivel_agregacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column cobertura_desde
+		dataType: int64
+		lineageTag: e297f2de-8fa8-5abd-b498-8ff1c770c829
+		summarizeBy: none
+		sourceColumn: cobertura_desde
+
+		annotation SummarizationSetBy = Automatic
+
+	column cobertura_hasta
+		dataType: int64
+		lineageTag: 134d8ad7-bd0f-57ad-b458-1821efe6f01e
+		summarizeBy: none
+		sourceColumn: cobertura_hasta
+
+		annotation SummarizationSetBy = Automatic
+
+	column rango_min
+		dataType: double
+		lineageTag: e25110ae-81fa-57dc-86cd-e1d8fd414978
+		summarizeBy: none
+		sourceColumn: rango_min
+
+		annotation SummarizationSetBy = Automatic
+
+	column rango_max
+		dataType: double
+		lineageTag: 0a3e765e-1aeb-551a-8e25-e6b1f91aef51
+		summarizeBy: none
+		sourceColumn: rango_max
+
+		annotation SummarizationSetBy = Automatic
+
+	column sentido
+		dataType: string
+		lineageTag: f30603d4-b8e6-5671-af20-7ade8ba7e60a
+		summarizeBy: none
+		sourceColumn: sentido
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: 39c71873-7c5d-5a0e-838d-16540e7dda88
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_indicador = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_indicador.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"indicador_key", Int64.Type}, {"codigo_indicador", type text}, {"nombre_indicador", type text}, {"tipo_indicador", type text}, {"codigo_kpi", type text}, {"okr", type text}, {"pestana_tablero", type text}, {"dominio", type text}, {"unidad", type text}, {"formula", type text}, {"codigo_fuente", type text}, {"origen", type text}, {"periodicidad", type text}, {"referencia_temporal", type text}, {"nivel_agregacion", type text}, {"cobertura_desde", Int64.Type}, {"cobertura_hasta", Int64.Type}, {"rango_min", type number}, {"rango_max", type number}, {"sentido", type text}, {"descripcion", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

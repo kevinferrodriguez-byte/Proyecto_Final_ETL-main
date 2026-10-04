@@ -1,0 +1,71 @@
+table aux_linaje
+	lineageTag: ae6f43fc-5bc8-5ec5-aeb5-4094c7c5df7e
+
+	column capa
+		dataType: string
+		lineageTag: 3969ba61-941f-5b0e-8163-68883fa6765d
+		summarizeBy: none
+		sourceColumn: capa
+
+		annotation SummarizationSetBy = Automatic
+
+	column dataset
+		dataType: string
+		lineageTag: 05105338-9405-5cc6-9525-7a3b23644141
+		summarizeBy: none
+		sourceColumn: dataset
+
+		annotation SummarizationSetBy = Automatic
+
+	column run_id
+		dataType: string
+		lineageTag: eaf7ba8c-623d-50a0-9c8b-3d084bdc07f9
+		summarizeBy: none
+		sourceColumn: run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column manifiesto
+		dataType: string
+		lineageTag: 15098919-4629-5e15-9041-87e10a164cf3
+		summarizeBy: none
+		sourceColumn: manifiesto
+
+		annotation SummarizationSetBy = Automatic
+
+	column sha256
+		dataType: string
+		lineageTag: 4939b172-201a-5256-a25f-750f51fbdbc0
+		summarizeBy: none
+		sourceColumn: sha256
+
+		annotation SummarizationSetBy = Automatic
+
+	column filas
+		dataType: int64
+		lineageTag: 8113cc04-4d6c-51c0-8bb3-f891cd15c7ee
+		summarizeBy: none
+		sourceColumn: filas
+
+		annotation SummarizationSetBy = Automatic
+
+	column bronze_run_ids
+		dataType: string
+		lineageTag: f75d489a-b15c-5832-a517-e1892a03b592
+		summarizeBy: none
+		sourceColumn: bronze_run_ids
+
+		annotation SummarizationSetBy = Automatic
+
+	partition aux_linaje = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "aux_linaje.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"capa", type text}, {"dataset", type text}, {"run_id", type text}, {"manifiesto", type text}, {"sha256", type text}, {"filas", Int64.Type}, {"bronze_run_ids", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

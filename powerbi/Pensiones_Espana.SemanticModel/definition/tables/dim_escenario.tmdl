@@ -1,0 +1,79 @@
+table dim_escenario
+	lineageTag: 0b9f5cf9-482e-56eb-b18a-4bb630a60254
+
+	column escenario_key
+		dataType: int64
+		lineageTag: 6b475196-18f3-5558-9140-0c0565cd214d
+		summarizeBy: none
+		sourceColumn: escenario_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_escenario
+		dataType: string
+		lineageTag: 98a607df-506a-5c6d-ab29-86ca17b5bbb3
+		summarizeBy: none
+		sourceColumn: codigo_escenario
+
+		annotation SummarizationSetBy = Automatic
+
+	column escenario_kr
+		dataType: string
+		lineageTag: 61ee6e90-a885-5984-93ae-cd59d8499049
+		summarizeBy: none
+		sourceColumn: escenario_kr
+
+		annotation SummarizationSetBy = Automatic
+
+	column etiqueta_ine
+		dataType: string
+		lineageTag: 1c219476-446f-5fea-ad97-3d87627dcb11
+		summarizeBy: none
+		sourceColumn: etiqueta_ine
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: 5f869ffc-936f-5b3b-9c47-1386f49f73a4
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_escenario_principal
+		dataType: boolean
+		lineageTag: b21dadc0-4859-5f0d-a494-27453585ddb3
+		summarizeBy: none
+		sourceColumn: es_escenario_principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column fuente_oficial
+		dataType: string
+		lineageTag: 45eeb6ac-6ba9-53a7-bcce-301e2c26ed98
+		summarizeBy: none
+		sourceColumn: fuente_oficial
+
+		annotation SummarizationSetBy = Automatic
+
+	column alcance
+		dataType: string
+		lineageTag: 724a1767-bb0b-57b8-b31a-9af277dd2c2a
+		summarizeBy: none
+		sourceColumn: alcance
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_escenario = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "dim_escenario.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"escenario_key", Int64.Type}, {"codigo_escenario", type text}, {"escenario_kr", type text}, {"etiqueta_ine", type text}, {"descripcion", type text}, {"es_escenario_principal", type logical}, {"fuente_oficial", type text}, {"alcance", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Pensiones_Espana"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "481c5d59-3c86-4aec-8ca5-6e0f5ee264d9"
+  }
+}

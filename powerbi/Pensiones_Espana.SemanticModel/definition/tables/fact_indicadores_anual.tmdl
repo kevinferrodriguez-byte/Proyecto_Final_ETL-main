@@ -1,0 +1,636 @@
+table fact_indicadores_anual
+	lineageTag: 374d9426-fc12-5575-b16c-10293c9c59b0
+
+	measure 'Valor observado' = SUM(fact_indicadores_anual[valor])
+		formatString: #,0.00
+		displayFolder: Base
+		lineageTag: 06217331-75c9-5b7a-81d5-4e9fee2c1649
+
+	measure 'KPI-01 Índice de envejecimiento' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "indice_envejecimiento", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: KPI
+		lineageTag: a302e0a8-9301-5d4d-9c59-030cc2ccf241
+
+	measure 'KPI-01 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "indice_envejecimiento") RETURN CALCULATE([KPI-01 Índice de envejecimiento], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: 97b8438a-e9b7-5bd4-bbab-29243b4d7b8c
+
+	measure 'KPI-02 Tasa de dependencia' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "tasa_dependencia", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: KPI
+		lineageTag: efec4e39-996e-5123-b3a6-864021dfc998
+
+	measure 'KPI-02 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_dependencia") RETURN CALCULATE([KPI-02 Tasa de dependencia], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: 0913d7c9-61c1-58bd-9e7e-1af0d4ccc80f
+
+	measure 'KPI-03 Dependencia de mayores' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "tasa_dependencia_mayores", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: KPI
+		lineageTag: c2bb5290-6e29-5adf-8bf5-2ddafb3cb1b2
+
+	measure 'KPI-03 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_dependencia_mayores") RETURN CALCULATE([KPI-03 Dependencia de mayores], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: da45f14a-dd8f-50f1-83e5-b7abc2fb5976
+
+	measure 'KPI-04 Fecundidad (hijos por mujer)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.00
+		displayFolder: KPI
+		lineageTag: 09b6d078-1957-506d-a621-e0d6d2fb8e77
+
+	measure 'KPI-04 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad") RETURN CALCULATE([KPI-04 Fecundidad (hijos por mujer)], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.00
+		displayFolder: Último valor
+		lineageTag: 4a76d7a6-42ef-55fb-ba08-0ab3596cb8d1
+
+	measure 'KPI-05 Saldo vegetativo' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "saldo_vegetativo", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: KPI
+		lineageTag: e7ec4806-a507-50ac-9f08-2fb044b0443c
+
+	measure 'KPI-05 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_vegetativo") RETURN CALCULATE([KPI-05 Saldo vegetativo], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: e3831c6b-9472-5a93-b4c9-a25636412b0f
+
+	measure 'KPI-06 Saldo migratorio exterior' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "saldo_migratorio_exterior", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: KPI
+		lineageTag: f0847844-dd8f-58cd-bd89-f5b5ba993777
+
+	measure 'KPI-06 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_migratorio_exterior") RETURN CALCULATE([KPI-06 Saldo migratorio exterior], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: e9e4ba65-b2cd-5b99-95f2-b13519862347
+
+	measure 'KPI-07 Afiliados por pensión' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.00
+		displayFolder: KPI
+		lineageTag: 15cfd676-f804-5f5f-bb42-f63917a73a8b
+
+	measure 'KPI-07 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas") RETURN CALCULATE([KPI-07 Afiliados por pensión], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.00
+		displayFolder: Último valor
+		lineageTag: 11775e0a-8bcc-5253-a689-b41c3f280adf
+
+	measure 'KPI-08 Gasto en pensiones % PIB' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "gasto_pensiones_pib", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: KPI
+		lineageTag: 7b96d4b4-d118-5b3a-a8e0-775c9fc65c19
+
+	measure 'KPI-08 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib") RETURN CALCULATE([KPI-08 Gasto en pensiones % PIB], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: 7a792a8e-8417-5e68-acce-b9e2653f815a
+
+	measure '% población 65+' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "porcentaje_mayores_65", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: Contexto
+		lineageTag: 64d9ba64-279a-51e1-b4c5-025ac5d87af2
+
+	measure '% población 65+ · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "porcentaje_mayores_65") RETURN CALCULATE([% población 65+], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: dd640a5c-346a-56f5-abb9-08bc9db43c68
+
+	measure 'Esperanza de vida al nacer' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "esperanza_vida_nacimiento", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.00
+		displayFolder: Contexto
+		lineageTag: 9d8173e9-e7d0-5bf5-84e1-605922747e77
+
+	measure 'Esperanza de vida al nacer · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "esperanza_vida_nacimiento") RETURN CALCULATE([Esperanza de vida al nacer], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.00
+		displayFolder: Último valor
+		lineageTag: ed3daa0b-8d09-5f4e-89d3-92bb3ed8f8bf
+
+	measure 'Tasa de afiliación 16-64' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: Contexto
+		lineageTag: b56fab1e-c445-5ad9-b2b2-d524257dcebc
+
+	measure 'Tasa de afiliación 16-64 · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64") RETURN CALCULATE([Tasa de afiliación 16-64], dim_tiempo[tiempo_key] = ultimo)
+		formatString: 0.0
+		displayFolder: Último valor
+		lineageTag: ca804da2-a712-54c2-885a-1dca6a7cd393
+
+	measure 'Pensión media mensual (€)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "pension_media_mensual", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Contexto
+		lineageTag: f6608014-e7ca-5b5c-a0b9-a82cf84cab93
+
+	measure 'Pensión media mensual (€) · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "pension_media_mensual") RETURN CALCULATE([Pensión media mensual (€)], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: bb7c055d-207a-5795-b454-b8f2265943e8
+
+	measure 'Población total' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "poblacion", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: dbe92a37-60c9-5918-8c71-5eb463ecf68a
+
+	measure 'Población total · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "poblacion") RETURN CALCULATE([Población total], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: ed887113-fb83-52f7-949a-b8981244457d
+
+	measure 'Afiliados a 31 de diciembre' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "total_afiliados", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: d281d8ac-ae9e-53e9-b394-9af209eb6ced
+
+	measure 'Afiliados a 31 de diciembre · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "total_afiliados") RETURN CALCULATE([Afiliados a 31 de diciembre], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: 3804d9cb-ba49-5dda-a70f-a6d46671ed72
+
+	measure 'Pensiones contributivas' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "total_pensiones", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: f0b115fe-7275-5a57-94af-2f126c926664
+
+	measure 'Pensiones contributivas · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "total_pensiones") RETURN CALCULATE([Pensiones contributivas], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: d58ab0ab-acec-5b82-930b-97c627054b23
+
+	measure 'Nómina mensual de pensiones (miles €)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "importe_nomina_pensiones", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: 7b0f9a16-d8ec-582c-a80a-c520e88cdd5f
+
+	measure 'Nómina mensual de pensiones (miles €) · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "importe_nomina_pensiones") RETURN CALCULATE([Nómina mensual de pensiones (miles €)], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: 1f17c305-5a66-52c0-9904-6423f418c729
+
+	measure 'PIB (M€)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "pib", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: f0f663f1-0e0d-50e3-b5d1-b81255bd45e3
+
+	measure 'PIB (M€) · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "pib") RETURN CALCULATE([PIB (M€)], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: 20d21920-dd3b-5650-a613-1bbfb50f6653
+
+	measure 'Gasto en pensiones (M€)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "gasto_pensiones", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: 980832c3-8eef-517b-86cc-7681044c164c
+
+	measure 'Gasto en pensiones (M€) · último' = VAR ultimo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones") RETURN CALCULATE([Gasto en pensiones (M€)], dim_tiempo[tiempo_key] = ultimo)
+		formatString: #,0
+		displayFolder: Último valor
+		lineageTag: d8e39743-fb0c-57a0-a250-49bdce23cb80
+
+	measure 'Esperanza de vida a los 65 (por sexo)' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "esperanza_vida_65", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0.0
+		displayFolder: Contexto
+		lineageTag: 6244bf77-b4e8-5069-9ef5-f8dcde514ec9
+
+	measure 'Población por grupo de edad' = CALCULATE([Valor observado], dim_indicador[codigo_indicador] = "poblacion", dim_sexo[codigo_sexo] = "total", KEEPFILTERS(dim_grupo_edad[codigo_grupo] <> "total"))
+		formatString: #,0
+		displayFolder: Métricas base
+		lineageTag: 270cfe3e-3785-5710-8075-32c4dfd4f226
+
+	measure 'Dependencia juvenil' = VAR total = [KPI-02 Tasa de dependencia] VAR mayores = [KPI-03 Dependencia de mayores] RETURN IF(ISBLANK(total) || ISBLANK(mayores), BLANK(), total - mayores)
+		formatString: 0.0
+		displayFolder: Contexto
+		lineageTag: 93df3eef-0a35-5cbc-8208-c417138f9e75
+
+	measure 'Afiliados (millones) · último' = DIVIDE([Afiliados a 31 de diciembre · último], 1000000)
+		formatString: 0.00
+		displayFolder: Último valor
+		lineageTag: f9b4bd33-f96e-573e-9298-b964d38c59f2
+
+	measure 'Pensiones (millones) · último' = DIVIDE([Pensiones contributivas · último], 1000000)
+		formatString: 0.00
+		displayFolder: Último valor
+		lineageTag: 02d2a822-7467-587c-b516-5dbeb68c1bd1
+
+	measure 'Gasto en pensiones (miles de M€) · último' = DIVIDE([Gasto en pensiones (M€) · último], 1000)
+		formatString: #,0.0
+		displayFolder: Último valor
+		lineageTag: 19c01a26-ab00-55f4-a41f-e729bdf0b2db
+
+	measure 'Nómina mensual (miles de M€) · último' = DIVIDE([Nómina mensual de pensiones (miles €) · último], 1000000)
+		formatString: #,0.00
+		displayFolder: Último valor
+		lineageTag: c3909cbd-13ab-5c03-a1e2-20472cc1fe27
+
+	measure 'Umbral de reemplazo (2,1)' = IF(ISBLANK([KPI-04 Fecundidad (hijos por mujer)]), BLANK(), 2.1)
+		formatString: 0.0
+		displayFolder: Referencias
+		lineageTag: bbc01e17-0d01-5aec-9ae5-f954fc0f89e3
+
+	measure 'Año base contributivo' = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "total_pensiones", ALLSELECTED(dim_tiempo))
+		formatString: 0
+		displayFolder: Índices
+		lineageTag: 27c71d4d-7a03-5960-9298-1251c5782358
+
+	measure 'Afiliados (índice)' = VAR a0 = [Año base contributivo] VAR base = CALCULATE([Afiliados a 31 de diciembre], REMOVEFILTERS(dim_tiempo), dim_tiempo[tiempo_key] = a0) RETURN IF(MAX(dim_tiempo[anyo]) >= a0, DIVIDE([Afiliados a 31 de diciembre], base) * 100)
+		formatString: 0.0
+		displayFolder: Índices
+		lineageTag: 195bf1fa-60ca-5642-8ac5-f6ca5d98cd5f
+
+	measure 'Pensiones (índice)' = VAR a0 = [Año base contributivo] VAR base = CALCULATE([Pensiones contributivas], REMOVEFILTERS(dim_tiempo), dim_tiempo[tiempo_key] = a0) RETURN IF(MAX(dim_tiempo[anyo]) >= a0, DIVIDE([Pensiones contributivas], base) * 100)
+		formatString: 0.0
+		displayFolder: Índices
+		lineageTag: b8715a9f-22fb-559b-9d6c-f60d80482eda
+
+	measure 'Base 100 (contributivo)' = IF(ISBLANK([Pensiones (índice)]), BLANK(), 100)
+		formatString: 0
+		displayFolder: Referencias
+		lineageTag: 0f05069d-409c-5ecc-87e8-c47c270dca2a
+
+	measure 'Año base financiero' = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo))
+		formatString: 0
+		displayFolder: Índices
+		lineageTag: 15825c02-0079-5d23-80f5-5d47101be0e4
+
+	measure 'Gasto en pensiones (índice)' = VAR a0 = [Año base financiero] VAR base = CALCULATE([Gasto en pensiones (M€)], REMOVEFILTERS(dim_tiempo), dim_tiempo[tiempo_key] = a0) RETURN IF(MAX(dim_tiempo[anyo]) >= a0, DIVIDE([Gasto en pensiones (M€)], base) * 100)
+		formatString: 0.0
+		displayFolder: Índices
+		lineageTag: f8113627-6d30-5200-90fe-cb9c76ca233d
+
+	measure 'PIB (índice)' = VAR a0 = [Año base financiero] VAR base = CALCULATE([PIB (M€)], REMOVEFILTERS(dim_tiempo), dim_tiempo[tiempo_key] = a0) RETURN IF(MAX(dim_tiempo[anyo]) >= a0 && NOT ISBLANK([Gasto en pensiones (M€)]), DIVIDE([PIB (M€)], base) * 100)
+		formatString: 0.0
+		displayFolder: Índices
+		lineageTag: 761f982f-853b-5e51-9bcb-a1f778a93817
+
+	measure 'Base 100 (financiero)' = IF(ISBLANK([PIB (índice)]), BLANK(), 100)
+		formatString: 0
+		displayFolder: Referencias
+		lineageTag: e1735d78-0e2b-5af9-a076-08346633371e
+
+	measure 'Año del último valor' = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: 0
+		displayFolder: Contexto KPI
+		lineageTag: ae1753fa-be75-55a0-bc6e-c1d915d8a416
+
+	measure 'Último valor' = VAR a = [Año del último valor] RETURN CALCULATE([Valor observado], dim_tiempo[tiempo_key] = a, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0.00
+		displayFolder: Contexto KPI
+		lineageTag: c723b823-45af-50fd-a73b-2550121a26bc
+
+	measure 'Valor año anterior' = VAR a = [Año del último valor] RETURN CALCULATE([Valor observado], dim_tiempo[tiempo_key] = a - 1, dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total")
+		formatString: #,0.00
+		displayFolder: Contexto KPI
+		lineageTag: 94306e3c-c736-5cd7-a937-e96ee2df840a
+
+	measure 'Variación absoluta' = VAR v = [Último valor] VAR p = [Valor año anterior] RETURN IF(ISBLANK(v) || ISBLANK(p), BLANK(), v - p)
+		formatString: #,0.00
+		displayFolder: Contexto KPI
+		lineageTag: 947c7799-1085-52ff-963c-768010c74536
+
+	measure 'Variación (texto)' = VAR d = [Variación absoluta] VAR p = [Valor año anterior] VAR codigo = SELECTEDVALUE(dim_indicador[codigo_indicador]) VAR unidad = SELECTEDVALUE(dim_indicador[unidad]) VAR anterior = [Año del último valor] - 1 VAR flecha = IF(d > 0, "▲ ", IF(d < 0, "▼ ", "■ ")) VAR cifra = SWITCH(TRUE(), unidad IN {"porcentaje", "porcentaje_pib"}, FORMAT(d, "+0.0;-0.0;0.0") & " pp", codigo IN {"saldo_vegetativo", "saldo_migratorio_exterior"}, FORMAT(d, "+#,0;-#,0;0"), unidad IN {"hijos_por_mujer", "afiliados_por_pension", "anos"}, FORMAT(d, "+0.00;-0.00;0.00"), FORMAT(DIVIDE(d, ABS(p)), "+0.0%;-0.0%;0.0%")) RETURN IF(ISBLANK(d), "Sin dato del año anterior", flecha & cifra & " vs " & anterior)
+		displayFolder: Contexto KPI
+		lineageTag: 554f6cee-b77a-5988-8363-2ca4abb54fa4
+
+	measure 'Lectura de la variación' = VAR d = [Variación absoluta] VAR s = SELECTEDVALUE(dim_indicador[sentido]) RETURN SWITCH(TRUE(), ISBLANK(d), BLANK(), d = 0 || s = "neutro", "neutral", (d > 0 && s = "mayor_es_mas_riesgo") || (d < 0 && s = "menor_es_mas_riesgo"), "desfavorable", "favorable")
+		displayFolder: Contexto KPI
+		lineageTag: d1ab9449-2d3a-5290-927a-aac9e52b1ed9
+
+	measure 'Color de la variación' = SWITCH([Lectura de la variación], "desfavorable", "#CF222E", "favorable", "#1A7F37", "#57606A")
+		displayFolder: Contexto KPI
+		lineageTag: 538c4cbc-542f-5478-8185-6835ade355c4
+
+	measure 'Estado del último valor' = VAR a = [Año del último valor] RETURN IF(CALCULATE(COUNTROWS(fact_indicadores_anual), dim_tiempo[tiempo_key] = a, fact_indicadores_anual[estado_dato] = "provisional", dim_sexo[codigo_sexo] = "total", dim_grupo_edad[codigo_grupo] = "total") > 0, "provisional", "definitivo")
+		displayFolder: Contexto KPI
+		lineageTag: 31114b5a-90f2-592a-9ffb-3c5a99a0b88d
+
+	measure 'Fuente (corta)' = SWITCH(SELECTEDVALUE(dim_indicador[codigo_fuente]), "ine", "INE", "seguridad_social", "Seguridad Social", "eurostat", "Eurostat", "integrado", "INE + Seguridad Social", "")
+		displayFolder: Contexto KPI
+		lineageTag: 1b28b708-85ba-5299-8226-01781c6117f7
+
+	measure 'Contexto del KPI' = VAR lectura = [Lectura de la variación] RETURN [Variación (texto)] & IF(ISBLANK(lectura) || lectura = "neutral", "", " (" & lectura & ")") & "  ·  dato " & [Año del último valor] & IF([Estado del último valor] = "provisional", " (provisional)", "") & "  ·  " & [Fuente (corta)]
+		displayFolder: Contexto KPI
+		lineageTag: bd03b6a1-d8a5-57e8-b5ee-8001d367a2b4
+
+	measure 'Último valor (texto)' = VAR v = [Último valor] VAR u = SELECTEDVALUE(dim_indicador[unidad]) VAR codigo = SELECTEDVALUE(dim_indicador[codigo_indicador]) RETURN IF(ISBLANK(v), BLANK(), SWITCH(TRUE(), u IN {"porcentaje", "porcentaje_pib"}, FORMAT(v, "0.0") & " %", codigo IN {"saldo_vegetativo", "saldo_migratorio_exterior"}, FORMAT(v, "+#,0;-#,0"), u = "hijos_por_mujer", FORMAT(v, "0.00"), u = "afiliados_por_pension", FORMAT(v, "0.00"), u = "eur_mes", FORMAT(v, "#,0") & " €", FORMAT(v, "#,0.0")))
+		displayFolder: Contexto KPI
+		lineageTag: 0daa9fc7-d35a-5c48-88f9-09a2786e1dff
+
+	measure 'Def · indicador' = SELECTEDVALUE(dim_indicador[nombre_indicador])
+		displayFolder: Definiciones
+		lineageTag: b86eb4f1-2c6b-5ec0-b453-63771cf832be
+
+	measure 'Def · fórmula' = SELECTEDVALUE(dim_indicador[formula])
+		displayFolder: Definiciones
+		lineageTag: 23565477-ae4a-5137-8f15-fcf130aa5ec5
+
+	measure 'Def · unidad' = SELECTEDVALUE(dim_indicador[unidad])
+		displayFolder: Definiciones
+		lineageTag: b7ca108d-5289-527d-b3d0-7498955a0cc1
+
+	measure 'Def · fuente' = SELECTEDVALUE(dim_fuente[organismo], [Fuente (corta)])
+		displayFolder: Definiciones
+		lineageTag: 5669f804-017f-5587-a9e4-f936f17a02ec
+
+	measure 'Def · cobertura' = SELECTEDVALUE(dim_indicador[cobertura_desde]) & "–" & SELECTEDVALUE(dim_indicador[cobertura_hasta])
+		displayFolder: Definiciones
+		lineageTag: 90d49d0e-dc95-522f-9fa3-d4f7ce15fd48
+
+	measure 'Def · descripción' = SELECTEDVALUE(dim_indicador[descripcion])
+		displayFolder: Definiciones
+		lineageTag: 708a9a0e-ec7b-59c8-b0bb-829a916655d6
+
+	measure 'Correlación dependencia-gasto' = VAR t = FILTER(ADDCOLUMNS(VALUES(dim_tiempo[anyo]), "@x", [KPI-03 Dependencia de mayores], "@y", [KPI-08 Gasto en pensiones % PIB]), NOT ISBLANK([@x]) && NOT ISBLANK([@y])) VAR mx = AVERAGEX(t, [@x]) VAR my = AVERAGEX(t, [@y]) RETURN DIVIDE(SUMX(t, ([@x] - mx) * ([@y] - my)), SQRT(SUMX(t, ([@x] - mx) ^ 2)) * SQRT(SUMX(t, ([@y] - my) ^ 2)))
+		formatString: 0.00
+		displayFolder: Contexto
+		lineageTag: ee85ed0d-3afb-54df-8177-e89bc429ccab
+
+	measure 'Año de los datos' = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), REMOVEFILTERS(dim_tiempo))
+		formatString: 0
+		displayFolder: Títulos
+		lineageTag: 8a12cc31-2da8-5365-bf43-c8776cc871ac
+
+	measure 'Subtítulo de los datos' = "Datos observados hasta " & CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), REMOVEFILTERS(dim_tiempo)) & "  ·  Fuentes oficiales: INE · Seguridad Social (TGSS/INSS) · Eurostat"
+		displayFolder: Títulos
+		lineageTag: c8da7f82-b745-5971-990f-de2177b645ec
+
+	measure 'Contexto · kpi03' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "tasa_dependencia_mayores")
+		displayFolder: Tarjetas
+		lineageTag: 74c9634c-bc8c-5b09-b901-8ab47df42b30
+
+	measure 'Color · kpi03' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "tasa_dependencia_mayores")
+		displayFolder: Tarjetas
+		lineageTag: f7884a94-e030-5a92-81f0-b553117dc0e6
+
+	measure 'Contexto · kpi07' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas")
+		displayFolder: Tarjetas
+		lineageTag: 1e83163a-24b3-57c2-9475-9af655e96a6d
+
+	measure 'Color · kpi07' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas")
+		displayFolder: Tarjetas
+		lineageTag: 35d3440b-a1cd-5c4f-ba65-b3fb5bdca18b
+
+	measure 'Contexto · kpi08' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "gasto_pensiones_pib")
+		displayFolder: Tarjetas
+		lineageTag: 63b61dfa-282c-5d1d-9cd1-1866993b3a99
+
+	measure 'Color · kpi08' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "gasto_pensiones_pib")
+		displayFolder: Tarjetas
+		lineageTag: 5c00d399-00e2-57ab-8914-558c4220c855
+
+	measure 'Contexto · kpi01' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "indice_envejecimiento")
+		displayFolder: Tarjetas
+		lineageTag: ef7bff01-1b46-58c7-90ab-140cfc709c1f
+
+	measure 'Color · kpi01' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "indice_envejecimiento")
+		displayFolder: Tarjetas
+		lineageTag: b7b26a0f-311b-5bd5-9a22-9669c5fd9a71
+
+	measure 'Contexto · kpi04' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad")
+		displayFolder: Tarjetas
+		lineageTag: fbc18c93-e765-5998-9adb-0b30f9343d1b
+
+	measure 'Color · kpi04' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad")
+		displayFolder: Tarjetas
+		lineageTag: 1aeaae7e-1f42-51d8-a5e2-e0fd3c48b87d
+
+	measure 'Contexto · p65' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "porcentaje_mayores_65")
+		displayFolder: Tarjetas
+		lineageTag: e20ecec9-8ac5-5ec0-b7c0-5e62a13d88a0
+
+	measure 'Color · p65' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "porcentaje_mayores_65")
+		displayFolder: Tarjetas
+		lineageTag: a9120bf0-6d56-5182-ba81-52ae0bff2e3d
+
+	measure 'Contexto · afiliacion' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64")
+		displayFolder: Tarjetas
+		lineageTag: f38082df-9c88-540a-a1dd-9629c8d45b84
+
+	measure 'Color · afiliacion' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64")
+		displayFolder: Tarjetas
+		lineageTag: db171a12-0bad-5d5f-a609-0f8a3197ba70
+
+	measure 'Contexto · afiliados' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "total_afiliados")
+		displayFolder: Tarjetas
+		lineageTag: 2d90a653-596e-5d9a-8bdb-fee857a3dd38
+
+	measure 'Color · afiliados' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "total_afiliados")
+		displayFolder: Tarjetas
+		lineageTag: 98bbc019-474f-562e-aa5b-f31510f3859f
+
+	measure 'Contexto · pensiones' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "total_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: 1b61ed85-8221-51cb-a042-315ba048cb8a
+
+	measure 'Color · pensiones' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "total_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: 42c3106c-8836-5c74-bcab-25c4e4326d9d
+
+	measure 'Contexto · gasto' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "gasto_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: 379b27db-5cb4-5a85-883e-b13111682690
+
+	measure 'Color · gasto' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "gasto_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: 80a3c77b-c40e-58ad-8f39-c73f927887ac
+
+	measure 'Contexto · media' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "pension_media_mensual")
+		displayFolder: Tarjetas
+		lineageTag: 62824f6e-744a-5f24-bf8b-bc0dde04f68c
+
+	measure 'Color · media' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "pension_media_mensual")
+		displayFolder: Tarjetas
+		lineageTag: e634e084-4b81-5adf-9f82-7235248e94ee
+
+	measure 'Contexto · nomina' = CALCULATE([Contexto del KPI], dim_indicador[codigo_indicador] = "importe_nomina_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: f67e5a26-8606-51d3-ac4e-763e1f7cb50a
+
+	measure 'Color · nomina' = CALCULATE([Color de la variación], dim_indicador[codigo_indicador] = "importe_nomina_pensiones")
+		displayFolder: Tarjetas
+		lineageTag: 52786edf-2bc0-590b-bfbf-ce69b7db6055
+
+	measure 'Título · dependencia' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_dependencia_mayores", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_dependencia_mayores", ALLSELECTED(dim_tiempo)) VAR v0 = CALCULATE([KPI-03 Dependencia de mayores], dim_tiempo[tiempo_key] = a0) VAR v1 = CALCULATE([KPI-03 Dependencia de mayores], dim_tiempo[tiempo_key] = a1) RETURN "La dependencia de mayores " & IF(v1 >= 2 * v0, "se duplicó", IF(v1 >= 1.95 * v0, "prácticamente se duplicó", IF(v1 > v0, "aumentó", "bajó"))) & ": de " & FORMAT(v0, "0.0") & " % (" & a0 & ") a " & FORMAT(v1, "0.0") & " % (" & a1 & ")"
+		displayFolder: Títulos
+		lineageTag: 19601e99-da80-5bca-afc0-4398f95b32e7
+
+	measure 'Título · estructura' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "porcentaje_mayores_65", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "porcentaje_mayores_65", ALLSELECTED(dim_tiempo)) VAR v0 = CALCULATE([% población 65+], dim_tiempo[tiempo_key] = a0) VAR v1 = CALCULATE([% población 65+], dim_tiempo[tiempo_key] = a1) RETURN "Las personas de 65+ pasan del " & FORMAT(v0, "0.0") & " % al " & FORMAT(v1, "0.0") & " % de la población (" & a0 & "–" & a1 & ")"
+		displayFolder: Títulos
+		lineageTag: 53211f93-57f5-59a2-8f77-cf326d1d8cad
+
+	measure 'Título · fecundidad' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad", ALLSELECTED(dim_tiempo)) VAR v1 = CALCULATE([KPI-04 Fecundidad (hijos por mujer)], dim_tiempo[tiempo_key] = a1) VAR vmin = CALCULATE(MIN(fact_indicadores_anual[valor]), dim_indicador[codigo_indicador] = "indicador_coyuntural_fecundidad", ALLSELECTED(dim_tiempo)) RETURN IF(v1 <= vmin, "La fecundidad marca su mínimo del periodo: ", "Fecundidad: ") & FORMAT(v1, "0.00") & " hijos por mujer en " & a1 & IF(v1 < 2.1, ", por debajo del reemplazo (2,1)", "")
+		displayFolder: Títulos
+		lineageTag: 108ee7da-207e-5b22-b805-5023ae4a46c7
+
+	measure 'Título · saldo vegetativo' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_vegetativo", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_vegetativo", ALLSELECTED(dim_tiempo)) VAR v1 = CALCULATE([KPI-05 Saldo vegetativo], dim_tiempo[tiempo_key] = a1) VAR ultimoPositivo = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_vegetativo", fact_indicadores_anual[valor] > 0, ALLSELECTED(dim_tiempo)) RETURN IF(v1 >= 0, "Saldo vegetativo positivo en " & a1, IF(ISBLANK(ultimoPositivo), "Saldo vegetativo negativo en todo el periodo", "Saldo vegetativo negativo desde " & (ultimoPositivo + 1) & ": mueren más personas de las que nacen"))
+		displayFolder: Títulos
+		lineageTag: 693e8698-7204-5cea-a589-0fbf27e680eb
+
+	measure 'Título · saldo migratorio' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_migratorio_exterior", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "saldo_migratorio_exterior", ALLSELECTED(dim_tiempo)) VAR v1 = CALCULATE([KPI-06 Saldo migratorio exterior], dim_tiempo[tiempo_key] = a1) RETURN "Saldo migratorio con el extranjero: " & FORMAT(v1, "+#,0;-#,0") & " en " & a1
+		displayFolder: Títulos
+		lineageTag: 5c72b11d-17f8-5091-9e64-2eaa3280bb7d
+
+	measure 'Título · índice contributivo' = VAR a0 = [Año base contributivo] VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "total_pensiones", ALLSELECTED(dim_tiempo)) VAR ga = DIVIDE(CALCULATE([Afiliados a 31 de diciembre], dim_tiempo[tiempo_key] = a1), CALCULATE([Afiliados a 31 de diciembre], dim_tiempo[tiempo_key] = a0)) - 1 VAR gp = DIVIDE(CALCULATE([Pensiones contributivas], dim_tiempo[tiempo_key] = a1), CALCULATE([Pensiones contributivas], dim_tiempo[tiempo_key] = a0)) - 1 RETURN "Desde " & a0 & ", los afiliados " & IF(ga > gp, "crecen más que las pensiones", "no crecen más que las pensiones") & ": " & FORMAT(ga, "+0%;-0%") & " frente a " & FORMAT(gp, "+0%;-0%") & " (" & a1 & ")"
+		displayFolder: Títulos
+		lineageTag: 98cfda54-465d-51c3-bb84-07278242bb4d
+
+	measure 'Título · ratio' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "ratio_cotizantes_pensionistas", ALLSELECTED(dim_tiempo)) VAR v0 = CALCULATE([KPI-07 Afiliados por pensión], dim_tiempo[tiempo_key] = a0) VAR v1 = CALCULATE([KPI-07 Afiliados por pensión], dim_tiempo[tiempo_key] = a1) RETURN "Afiliados por pensión: de " & FORMAT(v0, "0.00") & " (" & a0 & ") a " & FORMAT(v1, "0.00") & " (" & a1 & ")"
+		displayFolder: Títulos
+		lineageTag: 51ecf1d0-f66d-5eab-beb9-05267ff1dfa2
+
+	measure 'Título · afiliación' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64", ALLSELECTED(dim_tiempo)) VAR v1 = CALCULATE([Tasa de afiliación 16-64], dim_tiempo[tiempo_key] = a1) VAR vmax = CALCULATE(MAX(fact_indicadores_anual[valor]), dim_indicador[codigo_indicador] = "tasa_afiliacion_16_64", ALLSELECTED(dim_tiempo)) RETURN FORMAT(v1, "0.0") & " afiliados por cada 100 personas de 16-64 años en " & a1 & IF(v1 >= vmax, ": máximo del periodo", "")
+		displayFolder: Títulos
+		lineageTag: bbfbafa3-9697-5a95-9412-5c3456927897
+
+	measure 'Título · esperanza de vida 65' = VAR a = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "esperanza_vida_65", ALLSELECTED(dim_tiempo)) VAR mujeres = CALCULATE([Esperanza de vida a los 65 (por sexo)], dim_sexo[codigo_sexo] = "mujeres", dim_tiempo[tiempo_key] = a) VAR hombres = CALCULATE([Esperanza de vida a los 65 (por sexo)], dim_sexo[codigo_sexo] = "hombres", dim_tiempo[tiempo_key] = a) RETURN "A los 65 años, las mujeres viven en promedio " & FORMAT(mujeres - hombres, "0.0") & " años más que los hombres (" & a & ")"
+		displayFolder: Títulos
+		lineageTag: 80d58dc8-1004-543e-9772-6e4077da4847
+
+	measure 'Título · gasto' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR v0 = CALCULATE([KPI-08 Gasto en pensiones % PIB], dim_tiempo[tiempo_key] = a0) VAR v1 = CALCULATE([KPI-08 Gasto en pensiones % PIB], dim_tiempo[tiempo_key] = a1) VAR vmax = CALCULATE(MAX(fact_indicadores_anual[valor]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR amax = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", fact_indicadores_anual[valor] = vmax, ALLSELECTED(dim_tiempo)) RETURN "Gasto en pensiones: de " & FORMAT(v0, "0.0") & " % a " & FORMAT(v1, "0.0") & " % del PIB (" & a0 & "–" & a1 & ")" & IF(amax <> a1, "; máximo de " & FORMAT(vmax, "0.0") & " % en " & amax, "")
+		displayFolder: Títulos
+		lineageTag: ff925b4e-57df-51fd-a4e1-6e878f7c584c
+
+	measure 'Título · índice financiero' = VAR a0 = [Año base financiero] VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR gg = DIVIDE(CALCULATE([Gasto en pensiones (M€)], dim_tiempo[tiempo_key] = a1), CALCULATE([Gasto en pensiones (M€)], dim_tiempo[tiempo_key] = a0)) - 1 VAR gp = DIVIDE(CALCULATE([PIB (M€)], dim_tiempo[tiempo_key] = a1), CALCULATE([PIB (M€)], dim_tiempo[tiempo_key] = a0)) - 1 RETURN "Entre " & a0 & " y " & a1 & " el gasto en pensiones creció " & FORMAT(gg, "+0%;-0%") & " y el PIB " & FORMAT(gp, "+0%;-0%") & " (en euros corrientes)"
+		displayFolder: Títulos
+		lineageTag: 87bf0642-1468-50b5-a1cc-0a487a831281
+
+	measure 'Título · dispersión' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "gasto_pensiones_pib", ALLSELECTED(dim_tiempo)) VAR r = [Correlación dependencia-gasto] RETURN "Más dependencia de mayores se asocia a más gasto/PIB: correlación de " & FORMAT(r, "0.00") & " (" & a0 & "–" & a1 & ")"
+		displayFolder: Títulos
+		lineageTag: 85de235c-5b70-5b05-a775-594cd7d52e33
+
+	measure 'Título · pensión media' = VAR a0 = CALCULATE(MIN(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "pension_media_mensual", ALLSELECTED(dim_tiempo)) VAR a1 = CALCULATE(MAX(fact_indicadores_anual[tiempo_key]), dim_indicador[codigo_indicador] = "pension_media_mensual", ALLSELECTED(dim_tiempo)) VAR v0 = CALCULATE([Pensión media mensual (€)], dim_tiempo[tiempo_key] = a0) VAR v1 = CALCULATE([Pensión media mensual (€)], dim_tiempo[tiempo_key] = a1) RETURN "La pensión media pasa de " & FORMAT(v0, "#,0") & " € a " & FORMAT(v1, "#,0") & " € al mes (" & a0 & "–" & a1 & ", euros corrientes)"
+		displayFolder: Títulos
+		lineageTag: e3286529-0995-5511-ab50-d5d485b42dba
+
+	measure 'Título · calidad' = [Reglas superadas] & " de " & [Reglas evaluadas] & " reglas de calidad superadas · " & [Reglas con advertencia] & " advertencias · " & [Reglas con falla] & " fallas"
+		displayFolder: Títulos
+		lineageTag: c778e6c0-90d9-53e4-bec9-0bfc07f05de1
+
+	column tiempo_key
+		dataType: int64
+		isHidden
+		lineageTag: c3d533d2-07cb-5c5a-b1f2-13939d7e4e8b
+		summarizeBy: none
+		sourceColumn: tiempo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column territorio_key
+		dataType: int64
+		isHidden
+		lineageTag: fa7bbc06-eac7-5a88-819b-6f2701573cd5
+		summarizeBy: none
+		sourceColumn: territorio_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column sexo_key
+		dataType: int64
+		isHidden
+		lineageTag: d9befbf0-d695-5e81-94c1-7c1a4b56e311
+		summarizeBy: none
+		sourceColumn: sexo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column grupo_edad_key
+		dataType: int64
+		isHidden
+		lineageTag: 4193871b-363a-5955-a2f9-ac20539e81c4
+		summarizeBy: none
+		sourceColumn: grupo_edad_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column indicador_key
+		dataType: int64
+		isHidden
+		lineageTag: 9d0b7150-c383-5c82-82b5-658de1e9088d
+		summarizeBy: none
+		sourceColumn: indicador_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column fuente_key
+		dataType: int64
+		isHidden
+		lineageTag: ce35857b-ece8-5007-b7b2-0e4b17a943ac
+		summarizeBy: none
+		sourceColumn: fuente_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column valor
+		dataType: double
+		lineageTag: 9bead6c9-c1f8-5e77-adc2-83fc5ed6bbf7
+		summarizeBy: none
+		sourceColumn: valor
+
+		annotation SummarizationSetBy = Automatic
+
+	column unidad
+		dataType: string
+		lineageTag: 27611aea-9d03-581e-80d2-fc72a46bd4f0
+		summarizeBy: none
+		sourceColumn: unidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado_dato
+		dataType: string
+		lineageTag: ede73e42-6240-53dc-b842-2d9dbd1a6c31
+		summarizeBy: none
+		sourceColumn: estado_dato
+
+		annotation SummarizationSetBy = Automatic
+
+	column metodologia
+		dataType: string
+		lineageTag: 3df6e735-f371-58ea-9f82-53b46c0e62ed
+		summarizeBy: none
+		sourceColumn: metodologia
+
+		annotation SummarizationSetBy = Automatic
+
+	column dataset_origen
+		dataType: string
+		lineageTag: e233e2d1-403f-5c5e-b2f3-d6738133fe72
+		summarizeBy: none
+		sourceColumn: dataset_origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column run_id_origen
+		dataType: string
+		lineageTag: 4112b978-7e6b-5ab0-9b78-8571b6fb5bac
+		summarizeBy: none
+		sourceColumn: run_id_origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column gold_run_id
+		dataType: string
+		lineageTag: 1774e037-7701-50a9-993a-047a4a9c5ba6
+		summarizeBy: none
+		sourceColumn: gold_run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha_generacion
+		dataType: string
+		lineageTag: a63a1237-b74d-522b-9b2d-81b8842c7ab3
+		summarizeBy: none
+		sourceColumn: fecha_generacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_indicadores_anual = m
+		mode: import
+		source =
+				let
+				    Origen = Csv.Document(File.Contents(RutaCSV & "fact_indicadores_anual.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"tiempo_key", Int64.Type}, {"territorio_key", Int64.Type}, {"sexo_key", Int64.Type}, {"grupo_edad_key", Int64.Type}, {"indicador_key", Int64.Type}, {"fuente_key", Int64.Type}, {"valor", type number}, {"unidad", type text}, {"estado_dato", type text}, {"metodologia", type text}, {"dataset_origen", type text}, {"run_id_origen", type text}, {"gold_run_id", type text}, {"fecha_generacion", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

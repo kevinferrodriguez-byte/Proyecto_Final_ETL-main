@@ -1,0 +1,32 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: es-ES
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["RutaCSV", "dim_tiempo", "dim_territorio", "dim_sexo", "dim_grupo_edad", "dim_fuente", "dim_indicador", "dim_escenario", "fact_indicadores_anual", "fact_proyecciones_demograficas", "dm_panel_anual", "dm_escenarios_2050", "aux_calidad_reglas", "aux_linaje", "sel_indicador_escenario"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_tiempo
+ref table dim_territorio
+ref table dim_sexo
+ref table dim_grupo_edad
+ref table dim_fuente
+ref table dim_indicador
+ref table dim_escenario
+ref table fact_indicadores_anual
+ref table fact_proyecciones_demograficas
+ref table dm_panel_anual
+ref table dm_escenarios_2050
+ref table aux_calidad_reglas
+ref table aux_linaje
+ref table sel_indicador_escenario
+
+ref cultureInfo es-ES
+
