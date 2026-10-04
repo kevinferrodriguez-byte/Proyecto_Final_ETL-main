@@ -8,7 +8,7 @@ Pipeline ETL con **arquitectura Medallion** (Bronce → Plata → Oro) que integ
 
 ---
 
-## 1. Problema de negocio y objetivo
+## 1. Problema y objetivo
 
 - **El problema.**
   - El sistema de pensiones español es de reparto: las cotizaciones de quienes trabajan pagan las pensiones en curso.
