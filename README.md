@@ -207,8 +207,6 @@ Detalle y tratamiento en [docs/12_limitaciones_y_proximos_pasos.md](docs/12_limi
 
 | Documento | Contenido |
 | --- | --- |
-| [00 · Matriz de cumplimiento de la retroalimentación](docs/00_matriz_cumplimiento_retroalimentacion.md) | Cada comentario → cambio → archivo → verificación |
-| [01 · Diagnóstico](docs/01_diagnostico.md) | Estado de partida, problemas, inconsistencias y brechas |
 | [02 · Arquitectura](docs/02_arquitectura.md) | Medallion, flujo ETL, estructura y decisiones |
 | [03 · Fuentes de datos](docs/03_fuentes_datos.md) | Análisis por fuente, relaciones, Banco de España, fuentes periodísticas |
 | [04 · OKR, KPI y trazabilidad](docs/04_okr_kpi_trazabilidad.md) | Ficha de cada KPI, matriz de trazabilidad, preguntas reformuladas |
