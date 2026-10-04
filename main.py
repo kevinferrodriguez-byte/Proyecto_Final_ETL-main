@@ -1,12 +1,3 @@
-"""Punto de entrada del pipeline ETL: riesgo demográfico y sostenibilidad del sistema público de pensiones en España.
-
-Ejemplos:
-    python main.py                                  # todo: bronce → plata → indicadores → modelo → escenarios → carga
-    python main.py --desde plata                    # reutiliza el último Bronce íntegro (sin descargar)
-    python main.py --desde indicadores              # reutiliza la última Plata aprobada
-    python main.py --desde bronce --hasta plata     # solo ingesta y limpieza
-"""
-
 import argparse
 import sys
 
