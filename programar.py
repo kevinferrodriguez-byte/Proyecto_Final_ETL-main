@@ -1,10 +1,3 @@
-"""Ejecuta el pipeline ETL de forma automática según `config/config.yaml › programacion` con librería schedule.
-
-    python programar.py              # deja el programador activo
-    python programar.py --ahora      # ejecuta una vez al arrancar y después según la programación
-    python programar.py --una-vez    # ejecuta una sola vez y termina
-"""
-
 import argparse
 import sys
 
